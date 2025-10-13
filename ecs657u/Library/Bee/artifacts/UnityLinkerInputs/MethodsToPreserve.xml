@@ -1,0 +1,9 @@
+<linker>
+	<assembly fullname="Assembly-CSharp" ignoreIfMissing="1">
+		<type fullname="PlayerController_NewInput">
+			<method name="OnInteract"/>
+			<method name="OnLook"/>
+			<method name="OnMove"/>
+		</type>
+	</assembly>
+</linker>

@@ -36,7 +36,8 @@
           {
             "name": "AudioBehaviour",
             "scenes": [
-              "Assets/Scenes/SampleScene.unity"
+              "Assets/Scenes/Battle.unity",
+              "Assets/Scenes/Main.unity"
             ],
             "dependencyType": 0,
             "icon": null
@@ -50,7 +51,8 @@
           {
             "name": "AudioListener",
             "scenes": [
-              "Assets/Scenes/SampleScene.unity"
+              "Assets/Scenes/Battle.unity",
+              "Assets/Scenes/Main.unity"
             ],
             "dependencyType": 0,
             "icon": null
@@ -93,7 +95,8 @@
           {
             "name": "Camera",
             "scenes": [
-              "Assets/Scenes/SampleScene.unity"
+              "Assets/Scenes/Battle.unity",
+              "Assets/Scenes/Main.unity"
             ],
             "dependencyType": 0,
             "icon": null
@@ -113,7 +116,8 @@
           {
             "name": "Cubemap",
             "scenes": [
-              "Assets/Scenes/SampleScene.unity"
+              "Assets/Scenes/Battle.unity",
+              "Assets/Scenes/Main.unity"
             ],
             "dependencyType": 0,
             "icon": null
@@ -133,7 +137,8 @@
           {
             "name": "EditorExtension",
             "scenes": [
-              "Assets/Scenes/SampleScene.unity"
+              "Assets/Scenes/Battle.unity",
+              "Assets/Scenes/Main.unity"
             ],
             "dependencyType": 1,
             "icon": null
@@ -147,7 +152,8 @@
           {
             "name": "GameObject",
             "scenes": [
-              "Assets/Scenes/SampleScene.unity"
+              "Assets/Scenes/Battle.unity",
+              "Assets/Scenes/Main.unity"
             ],
             "dependencyType": 0,
             "icon": null
@@ -171,9 +177,18 @@
             "icon": null
           },
           {
+            "name": "LODGroup",
+            "scenes": [
+              "Assets/Scenes/Main.unity"
+            ],
+            "dependencyType": 0,
+            "icon": null
+          },
+          {
             "name": "LevelGameManager",
             "scenes": [
-              "Assets/Scenes/SampleScene.unity"
+              "Assets/Scenes/Battle.unity",
+              "Assets/Scenes/Main.unity"
             ],
             "dependencyType": 1,
             "icon": null
@@ -181,27 +196,41 @@
           {
             "name": "Light",
             "scenes": [
-              "Assets/Scenes/SampleScene.unity"
+              "Assets/Scenes/Battle.unity",
+              "Assets/Scenes/Main.unity"
+            ],
+            "dependencyType": 0,
+            "icon": null
+          },
+          {
+            "name": "LightProbeGroup",
+            "scenes": [
+              "Assets/Scenes/Main.unity"
             ],
             "dependencyType": 0,
             "icon": null
           },
           {
             "name": "LightProbes",
-            "scenes": [],
+            "scenes": [
+              "Assets/Scenes/Main.unity"
+            ],
             "dependencyType": 0,
             "icon": null
           },
           {
             "name": "LightingSettings",
-            "scenes": [],
+            "scenes": [
+              "Assets/Scenes/Main.unity"
+            ],
             "dependencyType": 0,
             "icon": null
           },
           {
             "name": "LightmapSettings",
             "scenes": [
-              "Assets/Scenes/SampleScene.unity"
+              "Assets/Scenes/Battle.unity",
+              "Assets/Scenes/Main.unity"
             ],
             "dependencyType": 0,
             "icon": null
@@ -215,32 +244,45 @@
           {
             "name": "Material",
             "scenes": [
-              "Assets/Scenes/SampleScene.unity"
+              "Assets/Scenes/Battle.unity",
+              "Assets/Scenes/Main.unity"
             ],
             "dependencyType": 0,
             "icon": null
           },
           {
             "name": "Mesh",
-            "scenes": [],
+            "scenes": [
+              "Assets/Scenes/Battle.unity",
+              "Assets/Scenes/Main.unity"
+            ],
             "dependencyType": 0,
             "icon": null
           },
           {
             "name": "MeshFilter",
-            "scenes": [],
+            "scenes": [
+              "Assets/Scenes/Battle.unity",
+              "Assets/Scenes/Main.unity"
+            ],
             "dependencyType": 0,
             "icon": null
           },
           {
             "name": "MeshRenderer",
-            "scenes": [],
+            "scenes": [
+              "Assets/Scenes/Battle.unity",
+              "Assets/Scenes/Main.unity"
+            ],
             "dependencyType": 0,
             "icon": null
           },
           {
             "name": "MonoBehaviour",
-            "scenes": [],
+            "scenes": [
+              "Assets/Scenes/Battle.unity",
+              "Assets/Scenes/Main.unity"
+            ],
             "dependencyType": 0,
             "icon": null
           },
@@ -252,14 +294,18 @@
           },
           {
             "name": "MonoScript",
-            "scenes": [],
+            "scenes": [
+              "Assets/Scenes/Battle.unity",
+              "Assets/Scenes/Main.unity"
+            ],
             "dependencyType": 1,
             "icon": null
           },
           {
             "name": "NamedObject",
             "scenes": [
-              "Assets/Scenes/SampleScene.unity"
+              "Assets/Scenes/Battle.unity",
+              "Assets/Scenes/Main.unity"
             ],
             "dependencyType": 1,
             "icon": null
@@ -290,20 +336,25 @@
           },
           {
             "name": "RectTransform",
-            "scenes": [],
+            "scenes": [
+              "Assets/Scenes/Battle.unity"
+            ],
             "dependencyType": 0,
             "icon": null
           },
           {
             "name": "ReflectionProbe",
-            "scenes": [],
+            "scenes": [
+              "Assets/Scenes/Main.unity"
+            ],
             "dependencyType": 0,
             "icon": null
           },
           {
             "name": "RenderSettings",
             "scenes": [
-              "Assets/Scenes/SampleScene.unity"
+              "Assets/Scenes/Battle.unity",
+              "Assets/Scenes/Main.unity"
             ],
             "dependencyType": 0,
             "icon": null
@@ -335,7 +386,8 @@
           {
             "name": "Shader",
             "scenes": [
-              "Assets/Scenes/SampleScene.unity"
+              "Assets/Scenes/Battle.unity",
+              "Assets/Scenes/Main.unity"
             ],
             "dependencyType": 0,
             "icon": null
@@ -354,7 +406,9 @@
           },
           {
             "name": "Sprite",
-            "scenes": [],
+            "scenes": [
+              "Assets/Scenes/Battle.unity"
+            ],
             "dependencyType": 0,
             "icon": null
           },
@@ -414,10 +468,8 @@
           },
           {
             "name": "Transform",
-            "scenes": [
-              "Assets/Scenes/SampleScene.unity"
-            ],
-            "dependencyType": 0,
+            "scenes": [],
+            "dependencyType": 1,
             "icon": null
           },
           {
@@ -497,6 +549,18 @@
             "scenes": [],
             "dependencyType": 2,
             "icon": "package/com.unity.modules.subsystems"
+          },
+          {
+            "name": "Required by Terrain Module",
+            "scenes": [],
+            "dependencyType": 2,
+            "icon": "package/com.unity.modules.terrain"
+          },
+          {
+            "name": "Required by TerrainPhysics Module",
+            "scenes": [],
+            "dependencyType": 2,
+            "icon": "package/com.unity.modules.terrainphysics"
           },
           {
             "name": "Required by TextCoreFontEngine Module",
@@ -678,10 +742,63 @@
         "name": "Physics",
         "dependencies": [
           {
+            "name": "BoxCollider",
+            "scenes": [
+              "Assets/Scenes/Main.unity"
+            ],
+            "dependencyType": 0,
+            "icon": null
+          },
+          {
+            "name": "CapsuleCollider",
+            "scenes": [
+              "Assets/Scenes/Main.unity"
+            ],
+            "dependencyType": 0,
+            "icon": null
+          },
+          {
+            "name": "CharacterController",
+            "scenes": [
+              "Assets/Scenes/Main.unity"
+            ],
+            "dependencyType": 0,
+            "icon": null
+          },
+          {
+            "name": "Collider",
+            "scenes": [],
+            "dependencyType": 1,
+            "icon": null
+          },
+          {
+            "name": "MeshCollider",
+            "scenes": [
+              "Assets/Scenes/Battle.unity",
+              "Assets/Scenes/Main.unity"
+            ],
+            "dependencyType": 0,
+            "icon": null
+          },
+          {
             "name": "PhysicsManager",
             "scenes": [],
             "dependencyType": 1,
             "icon": null
+          },
+          {
+            "name": "Rigidbody",
+            "scenes": [
+              "Assets/Scenes/Main.unity"
+            ],
+            "dependencyType": 0,
+            "icon": null
+          },
+          {
+            "name": "Required by TerrainPhysics Module",
+            "scenes": [],
+            "dependencyType": 2,
+            "icon": "package/com.unity.modules.terrainphysics"
           },
           {
             "name": "Required by VR Module",
@@ -818,6 +935,18 @@
             "icon": "package/com.unity.modules.subsystems"
           },
           {
+            "name": "Required by Terrain Module",
+            "scenes": [],
+            "dependencyType": 2,
+            "icon": "package/com.unity.modules.terrain"
+          },
+          {
+            "name": "Required by TerrainPhysics Module",
+            "scenes": [],
+            "dependencyType": 2,
+            "icon": "package/com.unity.modules.terrainphysics"
+          },
+          {
             "name": "Required by TextCoreFontEngine Module",
             "scenes": [],
             "dependencyType": 2,
@@ -885,6 +1014,54 @@
         ]
       },
       {
+        "name": "Terrain",
+        "dependencies": [
+          {
+            "name": "Terrain",
+            "scenes": [
+              "Assets/Scenes/Main.unity"
+            ],
+            "dependencyType": 0,
+            "icon": null
+          },
+          {
+            "name": "TerrainData",
+            "scenes": [
+              "Assets/Scenes/Main.unity"
+            ],
+            "dependencyType": 0,
+            "icon": null
+          },
+          {
+            "name": "TerrainLayer",
+            "scenes": [
+              "Assets/Scenes/Main.unity"
+            ],
+            "dependencyType": 0,
+            "icon": null
+          },
+          {
+            "name": "Required by TerrainPhysics Module",
+            "scenes": [],
+            "dependencyType": 2,
+            "icon": "package/com.unity.modules.terrainphysics"
+          }
+        ]
+      },
+      {
+        "name": "TerrainPhysics",
+        "dependencies": [
+          {
+            "name": "TerrainCollider",
+            "scenes": [
+              "Assets/Scenes/Main.unity"
+            ],
+            "dependencyType": 0,
+            "icon": null
+          }
+        ]
+      },
+      {
         "name": "TextCoreFontEngine",
         "dependencies": [
           {
@@ -923,7 +1100,9 @@
         "dependencies": [
           {
             "name": "Font",
-            "scenes": [],
+            "scenes": [
+              "Assets/Scenes/Battle.unity"
+            ],
             "dependencyType": 0,
             "icon": null
           },
@@ -964,7 +1143,9 @@
         "dependencies": [
           {
             "name": "Canvas",
-            "scenes": [],
+            "scenes": [
+              "Assets/Scenes/Battle.unity"
+            ],
             "dependencyType": 0,
             "icon": null
           },
@@ -976,7 +1157,9 @@
           },
           {
             "name": "CanvasRenderer",
-            "scenes": [],
+            "scenes": [
+              "Assets/Scenes/Battle.unity"
+            ],
             "dependencyType": 0,
             "icon": null
           },

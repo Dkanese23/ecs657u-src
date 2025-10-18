@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8205707806465486212}
   - component: {fileID: 63308672808528561}
   - component: {fileID: 8862644127919609210}
+  - component: {fileID: 5180605394348319984}
   m_Layer: 0
   m_Name: PlayerPawn
   m_TagString: Untagged
@@ -99,3 +100,17 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &5180605394348319984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2477495857647075882}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 589db639138b58e4f857abe97eaa7ba2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  displayName: Hero
+  baseAttack: 5

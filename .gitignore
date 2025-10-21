@@ -91,7 +91,7 @@ ecs657u/[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 # Custom ignores (project-specific)
 ecs657u/Assets/Scenes/Dylan_test.unity
 ecs657u/Assets/Scenes/Dylan_test.unity.meta
-ecs657u/Assets/Nicrom/
+ecs657u/Assets/BrokenVector
 
 # OS junk
 .DS_Store

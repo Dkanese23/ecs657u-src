@@ -1,4 +1,3 @@
-// DeckUI.cs
 using UnityEngine;
 
 public class DeckUI : MonoBehaviour
@@ -22,18 +21,17 @@ public class DeckUI : MonoBehaviour
 
     void Refresh()
     {
+        if (DeckService.I == null) return;
+
         foreach (Transform child in contentRoot)
             Destroy(child.gameObject);
 
-        if (DeckService.I == null || DeckService.I.currentDeck == null) return;
-
-        foreach (var card in DeckService.I.currentDeck.cards)
+        foreach (var card in DeckService.I.GetDeckCopy())
         {
             var go = Instantiate(cardItemPrefab, contentRoot);
             var ci = go.GetComponent<CardItem>();
-            ci.Bind(card, "Remove", (c) => {
-                DeckService.I.RemoveCard(c);
-            });
+            ci.Bind(card, "Remove", (c) => DeckService.I.RemoveCard(c));
         }
     }
+
 }

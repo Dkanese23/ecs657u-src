@@ -382,6 +382,7 @@
 "Assets/Scripts/Battle/Cards/Gaurd.cs"
 "Assets/Scripts/Battle/Cards/HandUI.cs"
 "Assets/Scripts/Battle/Cards/Heal.cs"
+"Assets/Scripts/Battle/Cards/InventoryData.cs"
 "Assets/Scripts/Battle/Cards/MagicBolt.cs"
 "Assets/Scripts/Battle/Cards/QuickStep.cs"
 "Assets/Scripts/Battle/Cards/Rally.cs"

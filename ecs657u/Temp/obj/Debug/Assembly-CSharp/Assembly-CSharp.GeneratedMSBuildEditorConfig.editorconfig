@@ -1,6 +1,6 @@
 is_global = true
 build_property.RootNamespace = 
-build_property.ProjectDir = C:\Users\dkane\GameDev2\ecs657u-src\ecs657u\
+build_property.ProjectDir = C:\Users\dkane\GameDev-src\ecs657u-src\ecs657u\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.CsWinRTUseWindowsUIXamlProjections = false

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\dkane\\GameDev2\\ecs657u-src\\ecs657u\\Assembly-CSharp-Editor.csproj": {}
+    "C:\\Users\\dkane\\GameDev-src\\ecs657u-src\\ecs657u\\Assembly-CSharp-Editor.csproj": {}
   },
   "projects": {
-    "C:\\Users\\dkane\\GameDev2\\ecs657u-src\\ecs657u\\Assembly-CSharp-Editor.csproj": {
+    "C:\\Users\\dkane\\GameDev-src\\ecs657u-src\\ecs657u\\Assembly-CSharp-Editor.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dkane\\GameDev2\\ecs657u-src\\ecs657u\\Assembly-CSharp-Editor.csproj",
+        "projectUniqueName": "C:\\Users\\dkane\\GameDev-src\\ecs657u-src\\ecs657u\\Assembly-CSharp-Editor.csproj",
         "projectName": "Assembly-CSharp-Editor",
-        "projectPath": "C:\\Users\\dkane\\GameDev2\\ecs657u-src\\ecs657u\\Assembly-CSharp-Editor.csproj",
+        "projectPath": "C:\\Users\\dkane\\GameDev-src\\ecs657u-src\\ecs657u\\Assembly-CSharp-Editor.csproj",
         "packagesPath": "C:\\Users\\dkane\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dkane\\GameDev2\\ecs657u-src\\ecs657u\\Temp\\obj\\Debug\\Assembly-CSharp-Editor\\",
+        "outputPath": "C:\\Users\\dkane\\GameDev-src\\ecs657u-src\\ecs657u\\Temp\\obj\\Debug\\Assembly-CSharp-Editor\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\dkane\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -26,8 +26,8 @@
           "netstandard2.1": {
             "targetAlias": "netstandard2.1",
             "projectReferences": {
-              "C:\\Users\\dkane\\GameDev2\\ecs657u-src\\ecs657u\\Assembly-CSharp.csproj": {
-                "projectPath": "C:\\Users\\dkane\\GameDev2\\ecs657u-src\\ecs657u\\Assembly-CSharp.csproj"
+              "C:\\Users\\dkane\\GameDev-src\\ecs657u-src\\ecs657u\\Assembly-CSharp.csproj": {
+                "projectPath": "C:\\Users\\dkane\\GameDev-src\\ecs657u-src\\ecs657u\\Assembly-CSharp.csproj"
               }
             }
           }
@@ -175,14 +175,14 @@
         }
       }
     },
-    "C:\\Users\\dkane\\GameDev2\\ecs657u-src\\ecs657u\\Assembly-CSharp.csproj": {
+    "C:\\Users\\dkane\\GameDev-src\\ecs657u-src\\ecs657u\\Assembly-CSharp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dkane\\GameDev2\\ecs657u-src\\ecs657u\\Assembly-CSharp.csproj",
+        "projectUniqueName": "C:\\Users\\dkane\\GameDev-src\\ecs657u-src\\ecs657u\\Assembly-CSharp.csproj",
         "projectName": "Assembly-CSharp",
-        "projectPath": "C:\\Users\\dkane\\GameDev2\\ecs657u-src\\ecs657u\\Assembly-CSharp.csproj",
+        "projectPath": "C:\\Users\\dkane\\GameDev-src\\ecs657u-src\\ecs657u\\Assembly-CSharp.csproj",
         "packagesPath": "C:\\Users\\dkane\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dkane\\GameDev2\\ecs657u-src\\ecs657u\\Temp\\obj\\Debug\\Assembly-CSharp\\",
+        "outputPath": "C:\\Users\\dkane\\GameDev-src\\ecs657u-src\\ecs657u\\Temp\\obj\\Debug\\Assembly-CSharp\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\dkane\\AppData\\Roaming\\NuGet\\NuGet.Config"

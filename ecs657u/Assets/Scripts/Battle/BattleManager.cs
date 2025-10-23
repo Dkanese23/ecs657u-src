@@ -16,6 +16,7 @@ public class BattleManager : MonoBehaviour
     public bool isBusy;
     public Text enemyHPText;
     public GameObject resultPanel;
+    public GameObject handPanel;
     public Text resultText;
     public GameObject handArea;
     public Button returnButton;
@@ -46,7 +47,7 @@ public class BattleManager : MonoBehaviour
         if (returnButton)
         {
             returnButton.onClick.RemoveAllListeners();
-            returnButton.onClick.AddListener(() => SceneManager.LoadScene("Main"));
+            returnButton.onClick.AddListener(() => SceneManager.LoadScene("Main(prototype)") ); // change to main later
         }
     }
 
@@ -275,6 +276,7 @@ public class BattleManager : MonoBehaviour
         resultText.text = "Victory!";
 
         handArea.SetActive(false);
+        handPanel.SetActive(false);
         
     }
 
@@ -299,6 +301,7 @@ public class BattleManager : MonoBehaviour
         resultText.text = "Defeat!";
 
         handArea.SetActive(false);
+        handPanel.SetActive(false);
     }
 
 }

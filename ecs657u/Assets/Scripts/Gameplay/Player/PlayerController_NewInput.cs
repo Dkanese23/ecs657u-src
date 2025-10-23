@@ -1,10 +1,17 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;  // needed for EventSystem
+
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(PlayerInput))]
 public class PlayerController_NewInput : MonoBehaviour
 {
+
+    [Header("UI")]
+    public GameObject inventoryUI; // drag your Inventory/Deck panel root here
+    bool uiOpen = false;
+
     [Header("Movement")]
     public float moveSpeed = 5f;
 
@@ -51,12 +58,23 @@ public class PlayerController_NewInput : MonoBehaviour
 
     public void OnMove(InputAction.CallbackContext ctx)
     {
+        // ignore movement if pointer over UI
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+        {
+            moveInput = Vector2.zero;
+            return;
+        }
+
         moveInput = ctx.ReadValue<Vector2>();
         if (ctx.canceled) moveInput = Vector2.zero;
     }
 
     public void OnLook(InputAction.CallbackContext ctx)
     {
+        // ignore camera input if pointer over UI
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            return;
+
         Vector2 d = ctx.ReadValue<Vector2>();
         yaw += d.x * lookSensitivity;
 
@@ -137,4 +155,28 @@ public class PlayerController_NewInput : MonoBehaviour
         Gizmos.DrawLine(origin, origin + transform.forward * interactRange);
         Gizmos.DrawWireSphere(origin + transform.forward * interactRange, interactRadius);
     }
+
+
+    public void OnToggleInventory(InputAction.CallbackContext ctx)
+    {
+        if (!ctx.performed) return;
+        ToggleInventory();
+    }
+
+    void ToggleInventory()
+    {
+        uiOpen = !uiOpen;
+
+        if (inventoryUI)
+            inventoryUI.SetActive(uiOpen);
+
+        // Cursor handling
+        Cursor.lockState = uiOpen ? CursorLockMode.None : CursorLockMode.Locked;
+        Cursor.visible = uiOpen;
+
+        // Optional: stop movement/camera when UI open
+        enabled = !uiOpen;  // disables this script while UI is open
+    }
+
+
 }

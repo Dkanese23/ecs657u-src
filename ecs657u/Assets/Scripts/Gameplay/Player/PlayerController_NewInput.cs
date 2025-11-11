@@ -10,7 +10,8 @@ public class PlayerController_NewInput : MonoBehaviour
 
     [Header("UI")]
     public GameObject inventoryUI; // drag your Inventory/Deck panel root here
-    bool uiOpen = false;
+    public GameObject rebindingPanel;
+    public GameObject pausePanel; // <-- NEW: Drag your Pause Panel here
 
     [Header("Movement")]
     public float moveSpeed = 5f;
@@ -42,7 +43,7 @@ public class PlayerController_NewInput : MonoBehaviour
 
         if (!playerCamera) playerCamera = Camera.main;
 
-        
+
         if (!camPivot)
         {
             var t = transform.Find("CameraRig/CamPivot");
@@ -54,6 +55,11 @@ public class PlayerController_NewInput : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        
+        // Disable all panels on start
+        inventoryUI?.SetActive(false);
+        rebindingPanel?.SetActive(false);
+        pausePanel?.SetActive(false); // <-- NEW
     }
 
     public void OnMove(InputAction.CallbackContext ctx)
@@ -87,7 +93,7 @@ public class PlayerController_NewInput : MonoBehaviour
         if (ctx.performed) TryInteractFromPlayer();
     }
 
-    void OnEnable()  { interactAction?.Enable(); }
+    void OnEnable() { interactAction?.Enable(); }
     void OnDisable() { interactAction?.Disable(); }
 
     void Update()
@@ -111,7 +117,7 @@ public class PlayerController_NewInput : MonoBehaviour
             Debug.LogWarning("camPivot not assigned/found. Create CameraRig/CamPivot under the player and assign it.");
     }
 
-    
+
     void TryInteractFromPlayer()
     {
         Vector3 origin = interactOrigin
@@ -156,6 +162,11 @@ public class PlayerController_NewInput : MonoBehaviour
         Gizmos.DrawWireSphere(origin + transform.forward * interactRange, interactRadius);
     }
 
+    // ##################################################################
+    // #region UI MANAGEMENT
+    // ##################################################################
+
+    // --- INPUT ACTION HANDLERS ---
 
     public void OnToggleInventory(InputAction.CallbackContext ctx)
     {
@@ -163,20 +174,155 @@ public class PlayerController_NewInput : MonoBehaviour
         ToggleInventory();
     }
 
-    void ToggleInventory()
+    public void OnToggleRebinding(InputAction.CallbackContext ctx)
     {
-        uiOpen = !uiOpen;
+        if (!ctx.performed) return;
+        ToggleRebinding();
+    }
 
-        if (inventoryUI)
-            inventoryUI.SetActive(uiOpen);
-
-        // Cursor handling
-        Cursor.lockState = uiOpen ? CursorLockMode.None : CursorLockMode.Locked;
-        Cursor.visible = uiOpen;
-
-        // Optional: stop movement/camera when UI open
-        enabled = !uiOpen;  // disables this script while UI is open
+    // NEW: Handler for the "TogglePause" action
+    public void OnTogglePause(InputAction.CallbackContext ctx)
+    {
+        if (!ctx.performed) return;
+        TogglePause();
     }
 
 
+    // --- TOGGLE LOGIC (Called by Input Actions) ---
+
+    void ToggleInventory()
+    {
+        if (!inventoryUI) return; 
+        
+        bool desiredState = !inventoryUI.activeSelf;
+
+        // Close all other panels
+        if (desiredState == true)
+        {
+            rebindingPanel?.SetActive(false);
+            pausePanel?.SetActive(false); // <-- UPDATED
+        }
+        
+        inventoryUI.SetActive(desiredState);
+        SetPlayerControl(!desiredState);
+    }
+
+    void ToggleRebinding()
+    {
+        if (!rebindingPanel) return; 
+
+        bool desiredState = !rebindingPanel.activeSelf;
+        
+        // Close all other panels
+        if (desiredState == true)
+        {
+            inventoryUI?.SetActive(false);
+            pausePanel?.SetActive(false); // <-- UPDATED
+        }
+        
+        rebindingPanel.SetActive(desiredState);
+        SetPlayerControl(!desiredState);
+    }
+
+    // NEW: Logic for toggling the pause menu
+    void TogglePause()
+    {
+        if (!pausePanel) return;
+
+        bool desiredState = !pausePanel.activeSelf;
+
+        // Close all other panels
+        if (desiredState == true)
+        {
+            inventoryUI?.SetActive(false);
+            rebindingPanel?.SetActive(false);
+        }
+
+        pausePanel.SetActive(desiredState);
+        SetPlayerControl(!desiredState);
+    }
+
+    // --- PUBLIC UI BUTTON FUNCTIONS ---
+    // NEW: These functions are for your UI Buttons to call from OnClick()
+
+    /// <summary>
+    /// Closes all UI panels and returns to the game.
+    /// Call this from your "Resume" button.
+    /// </summary>
+    public void ResumeGame()
+    {
+        inventoryUI?.SetActive(false);
+        rebindingPanel?.SetActive(false);
+        pausePanel?.SetActive(false);
+        
+        SetPlayerControl(true);
+    }
+
+    /// <summary>
+    /// Shows the Inventory panel from another UI panel (e.g., Pause Menu).
+    /// </summary>
+    public void ShowInventoryPanel()
+    {
+        inventoryUI?.SetActive(true);
+        rebindingPanel?.SetActive(false);
+        pausePanel?.SetActive(false);
+        
+        // We are still in a UI, so player control remains OFF
+        SetPlayerControl(false); 
+    }
+
+    /// <summary>
+    /// Shows the Rebinding panel from another UI panel (e.g., Pause Menu).
+    /// </summary>
+    public void ShowRebindingPanel()
+    {
+        inventoryUI?.SetActive(false);
+        rebindingPanel?.SetActive(true);
+        pausePanel?.SetActive(false);
+
+        // We are still in a UI, so player control remains OFF
+        SetPlayerControl(false);
+    }
+    
+    /// <summary>
+    /// Shows the Pause panel from another UI panel (e.g., a "Back" button).
+    /// </summary>
+    public void ShowPausePanel()
+    {
+        inventoryUI?.SetActive(false);
+        rebindingPanel?.SetActive(false);
+        pausePanel?.SetActive(true);
+
+        // We are still in a UI, so player control remains OFF
+        SetPlayerControl(false);
+    }
+
+
+    // --- CORE CONTROL FUNCTION ---
+
+    /// <summary>
+    /// Enables or disables player movement and camera control.
+    /// </summary>
+    /// <param name="hasControl">True to give control, False to take it away (for UI)</param>
+    void SetPlayerControl(bool hasControl)
+    {
+        // This stops Update/LateUpdate, freezing movement and camera
+        enabled = hasControl; 
+        
+        // Handle cursor
+        Cursor.lockState = hasControl ? CursorLockMode.Locked : CursorLockMode.None;
+        Cursor.visible = !hasControl;
+
+        // Just in case, stop movement when UI opens
+        if (!hasControl)
+        {
+            moveInput = Vector2.zero;
+            // Check if cc is not null before calling SimpleMove
+            if(cc != null) 
+            {
+                cc.SimpleMove(Vector3.zero); // Stop any residual movement
+            }
+        }
+    }
+    // #endregion
 }

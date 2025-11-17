@@ -11,7 +11,10 @@ public class PlayerController_NewInput : MonoBehaviour
     [Header("UI")]
     public GameObject inventoryUI; // drag your Inventory/Deck panel root here
     public GameObject rebindingPanel;
-    public GameObject pausePanel; // <-- NEW: Drag your Pause Panel here
+    public GameObject pausePanel;
+    public GameObject contrastVolume;
+
+    public GameObject settingsPanel;
 
     [Header("Movement")]
     public float moveSpeed = 5f;
@@ -59,7 +62,8 @@ public class PlayerController_NewInput : MonoBehaviour
         // Disable all panels on start
         inventoryUI?.SetActive(false);
         rebindingPanel?.SetActive(false);
-        pausePanel?.SetActive(false); // <-- NEW
+        pausePanel?.SetActive(false);
+        settingsPanel?.SetActive(false); // <-- NEW
     }
 
     public void OnMove(InputAction.CallbackContext ctx)
@@ -200,7 +204,8 @@ public class PlayerController_NewInput : MonoBehaviour
         if (desiredState == true)
         {
             rebindingPanel?.SetActive(false);
-            pausePanel?.SetActive(false); // <-- UPDATED
+            pausePanel?.SetActive(false);
+            settingsPanel?.SetActive(false); // <-- UPDATED
         }
         
         inventoryUI.SetActive(desiredState);
@@ -217,7 +222,8 @@ public class PlayerController_NewInput : MonoBehaviour
         if (desiredState == true)
         {
             inventoryUI?.SetActive(false);
-            pausePanel?.SetActive(false); // <-- UPDATED
+            pausePanel?.SetActive(false);
+            settingsPanel?.SetActive(false);  // <-- UPDATED
         }
         
         rebindingPanel.SetActive(desiredState);
@@ -254,6 +260,7 @@ public class PlayerController_NewInput : MonoBehaviour
         inventoryUI?.SetActive(false);
         rebindingPanel?.SetActive(false);
         pausePanel?.SetActive(false);
+        settingsPanel?.SetActive(false); 
         
         SetPlayerControl(true);
     }
@@ -266,6 +273,7 @@ public class PlayerController_NewInput : MonoBehaviour
         inventoryUI?.SetActive(true);
         rebindingPanel?.SetActive(false);
         pausePanel?.SetActive(false);
+        settingsPanel?.SetActive(false); 
         
         // We are still in a UI, so player control remains OFF
         SetPlayerControl(false); 
@@ -279,6 +287,7 @@ public class PlayerController_NewInput : MonoBehaviour
         inventoryUI?.SetActive(false);
         rebindingPanel?.SetActive(true);
         pausePanel?.SetActive(false);
+        settingsPanel?.SetActive(false); 
 
         // We are still in a UI, so player control remains OFF
         SetPlayerControl(false);
@@ -292,11 +301,37 @@ public class PlayerController_NewInput : MonoBehaviour
         inventoryUI?.SetActive(false);
         rebindingPanel?.SetActive(false);
         pausePanel?.SetActive(true);
+        settingsPanel?.SetActive(false); 
 
         // We are still in a UI, so player control remains OFF
         SetPlayerControl(false);
     }
 
+    public void ShowSettingsPanel()
+    {
+        inventoryUI?.SetActive(false);
+        rebindingPanel?.SetActive(false);
+        pausePanel?.SetActive(false);
+        settingsPanel?.SetActive(true); 
+
+        // We are still in a UI, so player control remains OFF
+        SetPlayerControl(false);
+    }
+
+        public void ToggleHighContrastMode()
+    {
+        if (contrastVolume.activeSelf)
+        {
+            contrastVolume?.SetActive(false);
+        }
+        else
+        {
+            contrastVolume?.SetActive(true);
+        }
+
+        // We are still in a UI, so player control remains OFF
+        SetPlayerControl(false); 
+    }
 
     // --- CORE CONTROL FUNCTION ---
 

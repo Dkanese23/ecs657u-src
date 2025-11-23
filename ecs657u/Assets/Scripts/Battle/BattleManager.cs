@@ -4,11 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class BattleManager : MonoBehaviour
+public partial class BattleManager : MonoBehaviour
 {
     [Header("Party & Enemy")]
     public List<BattleCharacter> party;    // 3 entries in scene
-    public EnemySimple enemy;
+    public EnemyBase enemy;                // now using EnemyBase
 
     [Header("UI")]
     public HandUI handUI;
@@ -27,46 +27,49 @@ public class BattleManager : MonoBehaviour
     [Header("Camera")]
     public BattleCamera battleCamera;
 
-    
+    // Deck state
     Queue<CardBase> drawPile = new();
     List<CardBase> discard = new();
 
     int turnIndex = 0;
     bool playerPhase = true;
 
-    
+    // Optional: quick buff bookkeeping for Rally
     Dictionary<BattleCharacter, (int bonus, int turns)> flatAtkBonus = new();
 
     void Awake()
     {
         if (drawSkipButton)
         {
-            drawSkipButton.onClick.RemoveAllListeners();           // ← ensure only one listener
+            drawSkipButton.onClick.RemoveAllListeners();
             drawSkipButton.onClick.AddListener(DrawAndSkip);
         }
         if (returnButton)
         {
             returnButton.onClick.RemoveAllListeners();
-            returnButton.onClick.AddListener(() => SceneManager.LoadScene("Main(prototype)") ); // change to main later
+            // TODO: change to final main scene name
+            returnButton.onClick.AddListener(() => SceneManager.LoadScene("Main(prototype)"));
         }
     }
 
-
     void Start()
     {
+        // Initialise enemy AI (important!)
+        if (enemy != null)
+            enemy.Initialize(this);
+
         // Nameplates
         foreach (var ch in party)
             nameplateHUD.Register(ch.transform, ch.Health, ch.displayName);
+
         Debug.Log($"Enemy Health: {enemy.Health}, CurrentHP: {enemy.Health?.CurrentHP}, MaxHP: {enemy.Health?.MaxHP}");
         nameplateHUD.Register(enemy.transform, enemy.Health, "Enemy");
-        
 
         // Camera focus: active char vs enemy
         battleCamera.SetFocus(party[0].transform, enemy.transform);
 
         // Enemy HP text
         enemy.Health.OnHealthChanged += (_, __) => RefreshEnemyHP();
-        // enemy.Health.OnDeath += OnEnemyDeath;
         RefreshEnemyHP();
 
         // Deck
@@ -79,18 +82,23 @@ public class BattleManager : MonoBehaviour
     void BuildAndShuffleDeck()
     {
         var list = DeckService.I ? DeckService.I.GetDeckCopy() : new List<CardBase>();
-        if (list.Count == 0) Debug.LogWarning("DeckService has no deck; using any scene-starting deck if assigned via inspector.");
+        if (list.Count == 0)
+            Debug.LogWarning("DeckService has no deck; using any scene-starting deck if assigned via inspector.");
 
+        // clone ScriptableObject instances so we don't mutate the assets
         var clonedList = new List<CardBase>();
         foreach (var card in list)
-        {
             clonedList.Add(Object.Instantiate(card));
-        }
 
         list = clonedList;
-        // Shuffle:
+
+        // Shuffle
         for (int i = list.Count - 1; i > 0; i--)
-        { int j = Random.Range(0, i + 1); (list[i], list[j]) = (list[j], list[i]); }
+        {
+            int j = Random.Range(0, i + 1);
+            (list[i], list[j]) = (list[j], list[i]);
+        }
+
         foreach (var c in list) drawPile.Enqueue(c);
     }
 
@@ -132,15 +140,15 @@ public class BattleManager : MonoBehaviour
             NextPartyOrEnemy();
             return;
         }
+
         battleCamera.SetFocus(active.transform, enemy.transform);
         nameplateHUD.Highlight(active.transform);
     }
 
     void NextPartyOrEnemy()
     {
-        
         turnIndex++;
-        
+
         if (turnIndex >= party.Count)
         {
             playerPhase = false;
@@ -157,29 +165,58 @@ public class BattleManager : MonoBehaviour
     IEnumerator EnemyTurn()
     {
         
-        yield return new WaitForSeconds(0.25f);
-
-        // pick target: taunting > lowest HP alive
-        BattleCharacter target = null;
-        foreach (var ch in party) if (ch.isTaunting && ch.Health.CurrentHP > 0) { target = ch; break; }
-        if (target == null)
+        if (enemy == null)
         {
-            int bestHP = int.MaxValue;
-            foreach (var ch in party)
-                if (ch.Health.CurrentHP > 0 && ch.Health.CurrentHP < bestHP) { bestHP = ch.Health.CurrentHP; target = ch; }
+            Debug.LogWarning("[BM] EnemyTurn called but enemy is null.");
+            StartPlayerPhase();
+            yield break;
         }
 
-        if (target != null) target.ReceiveDamage(enemy.attackDamage);
+        Debug.Log($"[BM] EnemyTurn start. Enemy HP: {enemy.Health.CurrentHP}/{enemy.Health.MaxHP}");
 
-        yield return new WaitForSeconds(0.2f);
+        // dead enemy = no turn
+        if (enemy.Health.CurrentHP <= 0)
+        {
+            Debug.Log("[BM] Enemy is dead, skipping enemy turn.");
+            StartPlayerPhase();
+            yield break;
+        }
+        
+        Debug.Log($"[BM] Party count: {(party == null ? 0 : party.Count)}");
+        if (party != null)
+        {
+            for (int i = 0; i < party.Count; i++)
+            {
+                var ch = party[i];
+                Debug.Log($"[BM] party[{i}] = {(ch ? ch.displayName : "null")}  hp={(ch && ch.Health != null ? ch.Health.CurrentHP : -1)}/{(ch && ch.Health != null ? ch.Health.MaxHP : -1)}");
+                Debug.Log($"[BM] party[{i}] scene='{(ch ? ch.gameObject.scene.name : "<null>")}' object={ch?.name}");
+            }
+        }
+
+
+        // Let the enemy AI choose its move
+        enemy.PlanNextAction(party);
+        
+
+        // Execute that move (Heal / Power Up / Dark Bolt)
+        yield return StartCoroutine(enemy.ExecuteTurn(party));
+
+        // After enemy has acted, re-check defeat
         CheckDefeat();
-        if (resultPanel.activeSelf) yield break;
+        if (resultPanel != null && resultPanel.activeSelf)
+        {
+            Debug.Log("[BM] Party defeated after enemy action.");
+            yield break;
+        }
 
-        // round tick
-        foreach (var ch in party) ch.TickEndOfRound();
+        // End-of-round ticks (taunt, buffs, etc.)
+        foreach (var ch in party)
+            if (ch != null) ch.TickEndOfRound();
 
+        Debug.Log("[BM] Enemy turn ended, starting player phase.");
         StartPlayerPhase();
     }
+
 
     void OnCardClicked(CardBase c)
     {
@@ -192,7 +229,7 @@ public class BattleManager : MonoBehaviour
         // Apply flat bonus if active
         if (flatAtkBonus.TryGetValue(actor, out var b) && b.turns > 0 && c.School == CardSchool.Physical)
         {
-            // quick-and-dirty: bump actor.baseAttack temporarily
+            
             actor.baseAttack += b.bonus;
             c.Play(ctx);
             actor.baseAttack -= b.bonus;
@@ -206,31 +243,25 @@ public class BattleManager : MonoBehaviour
 
         handUI.Remove(c);
         discard.Add(c);
-        // DrawToHand();  keep hand topped if possible
+        // no auto-draw here – Draw & Skip handles drawing mid-battle
 
         if (enemy.Health.CurrentHP > 0)
             NextPartyOrEnemy();
+
         isBusy = false;
     }
 
     void DrawAndSkip()
     {
-        
-        if (!playerPhase || isBusy)
-        {
-            
-            return;
-        }
+        if (!playerPhase || isBusy) return;
+
         drawSkipButton.interactable = false;
         isBusy = true;
-        
 
         TryDrawOne();
-        
         NextPartyOrEnemy();
 
         isBusy = false;
-        
     }
 
     void TryDrawOne()
@@ -248,7 +279,6 @@ public class BattleManager : MonoBehaviour
         handUI.AddCard(card, OnCardClicked);
     }
 
-
     public void DamageEnemy(int amount)
     {
         enemy.Health.TakeDamage(amount);
@@ -258,7 +288,10 @@ public class BattleManager : MonoBehaviour
             OnEnemyDeath();
     }
 
-    public void RefreshNameplates() { /* the HUD updates via health events; keep for future */ }
+    public void RefreshNameplates()
+    {
+        // HUD auto-updates HP via events; keep for future badges/overlays
+    }
 
     public void TagFlatAttackBonus(BattleCharacter who, int bonus, int turns)
     {
@@ -267,7 +300,8 @@ public class BattleManager : MonoBehaviour
 
     void RefreshEnemyHP()
     {
-        if (enemyHPText) enemyHPText.text = $"Enemy HP: {enemy.Health.CurrentHP}/{enemy.Health.MaxHP}";
+        if (enemyHPText)
+            enemyHPText.text = $"Enemy HP: {enemy.Health.CurrentHP}/{enemy.Health.MaxHP}";
     }
 
     void OnEnemyDeath()
@@ -277,7 +311,6 @@ public class BattleManager : MonoBehaviour
 
         handArea.SetActive(false);
         handPanel.SetActive(false);
-        
     }
 
     void CheckDefeat()
@@ -303,5 +336,4 @@ public class BattleManager : MonoBehaviour
         handArea.SetActive(false);
         handPanel.SetActive(false);
     }
-
 }

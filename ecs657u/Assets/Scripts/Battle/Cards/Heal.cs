@@ -7,5 +7,6 @@ public class HealCard : CardBase
     public override void Play(BattleContext ctx)
     {
         (ctx.Target ?? ctx.Actor).Health.Heal(Scale(ctx.Actor, BaseHeal));
+        ctx.BM.LogHeal(ctx.Actor.displayName, (ctx.Target ?? ctx.Actor).displayName, Scale(ctx.Actor, BaseHeal));
     }
 }

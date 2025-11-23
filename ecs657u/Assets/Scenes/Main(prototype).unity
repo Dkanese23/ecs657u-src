@@ -27473,6 +27473,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 210442451396089719, guid: aa0ab652971e3e24a9f6d8c16164baaa, type: 3}
   m_PrefabInstance: {fileID: 617929559}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &618391597 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4894898793099344321, guid: 90defa8c03bdbe346a88de3c9b59c7ef, type: 3}
+  m_PrefabInstance: {fileID: 1147863809}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &618712347
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -49129,19 +49134,42 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnemyPawn
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5898183112898725635, guid: 90defa8c03bdbe346a88de3c9b59c7ef, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 1472486021714091885, guid: 90defa8c03bdbe346a88de3c9b59c7ef, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1992305600}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4894898793099344321, guid: 90defa8c03bdbe346a88de3c9b59c7ef, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1147863815}
   m_SourcePrefab: {fileID: 100100000, guid: 90defa8c03bdbe346a88de3c9b59c7ef, type: 3}
 --- !u!4 &1147863810 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1472486021714091885, guid: 90defa8c03bdbe346a88de3c9b59c7ef, type: 3}
   m_PrefabInstance: {fileID: 1147863809}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1147863815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 618391597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08965a830b6dab44fba1a2cf2b371915, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyName: Enemy
+  attackDamage: 3
+  nextAction: 
+  actionValue: 0
+  healAmount: 10
+  magicDamage: 6
+  buffAmount: 3
 --- !u!1001 &1149281570
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -29,5 +29,5 @@ public class BattleContext
     public BattleManager BM;
     public BattleCharacter Actor;   // the acting character
     public BattleCharacter Target;  // target ally (for heal/buffs); defaults to Actor
-    public EnemySimple Enemy;       // single enemy
+    public EnemyBase Enemy;       // single enemy
 }

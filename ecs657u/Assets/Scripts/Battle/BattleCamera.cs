@@ -7,7 +7,7 @@ public class BattleCamera : MonoBehaviour
 {
     public Transform focusA;              // active party member
     public Transform focusB;              // enemy
-    public Vector3 offset = new(0, 2.0f, 0);  // elevate look point
+    public Vector3 offset = new(0, 0, 2.0f);
     public float orbitDegreesPerSec = 15f;
     public float manualOrbitSensitivity = 120f;   // hold RMB + move
     public float minDistance = 6f, maxDistance = 14f;

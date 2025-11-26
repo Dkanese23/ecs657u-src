@@ -3,7 +3,7 @@ using UnityEngine;
 public class BlockCard : CardBase
 {
     public int BaseShield = 5;
-    private void OnEnable(){ School = CardSchool.Support; Title="Block"; Description="Gain shield (absorbs damage)."; }
+    private void OnEnable(){ School = CardSchool.Support; Title="Block"; Description="Gain shield."; }
     public override void Play(BattleContext ctx)
     {
         (ctx.Target ?? ctx.Actor).AddShield(Scale(ctx.Actor, BaseShield));

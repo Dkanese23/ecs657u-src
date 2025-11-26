@@ -4,11 +4,19 @@ public enum CardSchool { Physical, Support, Magic }
 
 public abstract class CardBase : ScriptableObject
 {
+    public enum TargetingType
+    {
+        None,
+        Self,
+        Ally,
+        SelfOrAlly,
+        Enemy
+    }
+
     public string Title = "Card";
     [TextArea] public string Description;
     public CardSchool School = CardSchool.Physical;
-
-    // MVP: energy-free; you can add cost later
+    public virtual TargetingType Targeting => TargetingType.None;
     public abstract void Play(BattleContext ctx);
 
     // Simple scaling helpers

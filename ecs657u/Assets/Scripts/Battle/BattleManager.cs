@@ -33,9 +33,33 @@ public partial class BattleManager : MonoBehaviour
 
     int turnIndex = 0;
     bool playerPhase = true;
+    CardBase pendingCard;
+    bool waitingForAllyTarget;
+    bool handInputLocked;
 
     // Optional: quick buff bookkeeping for Rally
     Dictionary<BattleCharacter, (int bonus, int turns)> flatAtkBonus = new();
+
+    public void AttachEnemy(EnemyBase e)
+    {
+        enemy = e;
+        enemy.Initialize(this);
+
+        // hook HP UI once here
+        if (enemyHPText)
+        {
+            enemy.Health.OnHealthChanged -= (_, __) => RefreshEnemyHP(); // defensive
+            enemy.Health.OnHealthChanged += (_, __) => RefreshEnemyHP();
+            RefreshEnemyHP();
+        }
+    
+
+        // nameplate & camera refresh
+        if (nameplateHUD) nameplateHUD.Register(enemy.transform, enemy.Health, enemy.enemyName);
+        if (party != null && party.Count > 0 && battleCamera)
+            battleCamera.SetFocus(party[0].transform, enemy.transform);
+    }
+
 
     void Awake()
     {
@@ -54,29 +78,43 @@ public partial class BattleManager : MonoBehaviour
 
     void Start()
     {
-        // Initialise enemy AI (important!)
-        if (enemy != null)
-            enemy.Initialize(this);
+        // Party nameplates first
+        if (nameplateHUD)
+        {
+            foreach (var ch in party)
+                if (ch) nameplateHUD.Register(ch.transform, ch.Health, ch.displayName);
+        }
 
-        // Nameplates
-        foreach (var ch in party)
-            nameplateHUD.Register(ch.transform, ch.Health, ch.displayName);
-
-        Debug.Log($"Enemy Health: {enemy.Health}, CurrentHP: {enemy.Health?.CurrentHP}, MaxHP: {enemy.Health?.MaxHP}");
-        nameplateHUD.Register(enemy.transform, enemy.Health, "Enemy");
-
-        // Camera focus: active char vs enemy
-        battleCamera.SetFocus(party[0].transform, enemy.transform);
-
-        // Enemy HP text
-        enemy.Health.OnHealthChanged += (_, __) => RefreshEnemyHP();
-        RefreshEnemyHP();
+        
+        if (enemy != null) AttachEnemy(enemy);
+        // Camera focus on first party member (enemy may come later)
+        if (battleCamera && party != null && party.Count > 0 && party[0])
+            battleCamera.SetFocus(party[0].transform, enemy ? enemy.transform : party[0].transform);
 
         // Deck
         BuildAndShuffleDeck();
         DealStartingHand(5);
 
-        StartPlayerPhase();
+        ShowHowToThenStart();
+    }
+
+    void ShowHowToThenStart()
+    {
+        // Show only once
+        if (PlayerPrefs.GetInt("CardHowToSeen", 0) == 0)
+        {
+            var msg = "Pick a card for each hero in turn. Attack scales with Strength, support with Agility, magic with Intelligence. Click a card, then click a target if needed; or press Draw to skip and draw a new card.";
+            BattleHowToUI.Show(msg, () =>
+            {
+                PlayerPrefs.SetInt("CardHowToSeen", 1);
+                PlayerPrefs.Save();
+                StartPlayerPhase();
+            });
+        }
+        else
+        {
+            StartPlayerPhase();
+        }
     }
 
     void BuildAndShuffleDeck()
@@ -134,16 +172,16 @@ public partial class BattleManager : MonoBehaviour
     void FocusActive()
     {
         var active = party[turnIndex];
-        if (active.Health.CurrentHP <= 0)
-        {
-            // skip to next
-            NextPartyOrEnemy();
-            return;
-        }
 
-        battleCamera.SetFocus(active.transform, enemy.transform);
-        nameplateHUD.Highlight(active.transform);
+        if (active.Health.CurrentHP <= 0) { NextPartyOrEnemy(); return; }
+
+        // if (battleCamera)
+        //     battleCamera.SetFocus(active.transform, enemy ? enemy.transform : active.transform);
+
+        if (nameplateHUD)
+            nameplateHUD.Highlight(active.transform);
     }
+
 
     void NextPartyOrEnemy()
     {
@@ -220,36 +258,81 @@ public partial class BattleManager : MonoBehaviour
 
     void OnCardClicked(CardBase c)
     {
-        if (!playerPhase || isBusy) return;
+        if (!playerPhase || isBusy || handInputLocked) return;
+
+        // If this card needs an ally target, enter targeting mode
+        if (c.Targeting == CardBase.TargetingType.Ally || c.Targeting == CardBase.TargetingType.SelfOrAlly)
+        {
+            pendingCard = c;
+            waitingForAllyTarget = true;
+            handInputLocked = true;
+            // handUI.HighlightCard(c);                 // optional: visually show it’s selected
+            nameplateHUD.EnableAllyClicks(this);     // (see below) make nameplates clickable
+            LogAction("Select an ally to target (or press ESC to cancel).");
+            return;
+        }
+
+        // otherwise: play immediately with self/none target
+        PlayCardNow(c, target: null);
+    }
+
+    void PlayCardNow(CardBase c, BattleCharacter target)
+    {
         isBusy = true;
 
         var actor = party[turnIndex];
-        var ctx = new BattleContext { BM = this, Actor = actor, Target = actor, Enemy = enemy };
+        var ctx = new BattleContext { BM = this, Actor = actor, Target = target, Enemy = enemy };
 
-        // Apply flat bonus if active
-        if (flatAtkBonus.TryGetValue(actor, out var b) && b.turns > 0 && c.School == CardSchool.Physical)
-        {
-            
-            actor.baseAttack += b.bonus;
-            c.Play(ctx);
-            actor.baseAttack -= b.bonus;
-            flatAtkBonus[actor] = (b.bonus, b.turns - 1);
-            if (flatAtkBonus[actor].turns <= 0) flatAtkBonus.Remove(actor);
-        }
-        else
-        {
-            c.Play(ctx);
-        }
+        c.Play(ctx);
 
         handUI.Remove(c);
         discard.Add(c);
-        // no auto-draw here – Draw & Skip handles drawing mid-battle
 
         if (enemy.Health.CurrentHP > 0)
             NextPartyOrEnemy();
-
         isBusy = false;
     }
+
+    public void SelectAllyTarget(BattleCharacter chosen)
+    {
+        if (!waitingForAllyTarget || pendingCard == null) return;
+
+        // If card allows self or ally, chosen may be same as actor; if "Ally" only, you can enforce different target here
+        var actor = party[turnIndex];
+        if (pendingCard.Targeting == CardBase.TargetingType.Ally && chosen == actor)
+        {
+            LogAction("This card must target another ally.");
+            return;
+        }
+
+        // play and clear state
+        var c = pendingCard;
+        pendingCard = null;
+        waitingForAllyTarget = false;
+        handInputLocked = false;
+        nameplateHUD.DisableAllyClicks();
+        // handUI.ClearHighlight();
+        PlayCardNow(c, chosen);
+    }
+
+    public void CancelTargeting()
+    {
+        if (!waitingForAllyTarget) return;
+        waitingForAllyTarget = false;
+        handInputLocked = false;
+        pendingCard = null;
+        nameplateHUD.DisableAllyClicks();
+        // handUI.ClearHighlight();
+        LogAction("Target selection canceled.");
+    }
+
+    void Update()
+    {
+    if (waitingForAllyTarget && Input.GetKeyDown(KeyCode.Escape))
+        CancelTargeting();
+    }
+
+
 
     void DrawAndSkip()
     {
@@ -306,8 +389,24 @@ public partial class BattleManager : MonoBehaviour
 
     void OnEnemyDeath()
     {
+        if (GameState.I != null)
+        {
+            // mark defeated
+            if (!string.IsNullOrEmpty(GameState.I.currentEnemyId))
+                GameState.I.MarkEnemyDefeated(GameState.I.currentEnemyId);
+
+            // grant key item (example)
+            GameState.I.AddKeyItem("key_fragment"); // change per enemy type/ID if needed
+
+            // clear encounter
+            GameState.I.ClearEncounter();
+
+            // ensure we restore to last checkpoint (optional: you may want to continue ahead instead)
+            GameState.I.pendingRespawn = true; // use checkpoint even on win (optional behavior)
+        }
+
         resultPanel.SetActive(true);
-        resultText.text = "Victory!";
+        resultText.text = "Victory! You received a key fragment.";
 
         handArea.SetActive(false);
         handPanel.SetActive(false);
@@ -329,6 +428,13 @@ public partial class BattleManager : MonoBehaviour
         playerPhase = false;
         drawSkipButton.interactable = false;
 
+        if (GameState.I != null)
+        {
+            // Do NOT mark defeated; enemy stays in overworld
+            // Just flag respawn to checkpoint
+            GameState.I.pendingRespawn = true;
+            GameState.I.ClearEncounter();
+        }
         // show UI
         resultPanel.SetActive(true);
         resultText.text = "Defeat!";

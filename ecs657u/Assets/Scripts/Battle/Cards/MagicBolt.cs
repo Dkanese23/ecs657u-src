@@ -8,5 +8,6 @@ public class MagicBoltCard : CardBase
     {
         int dmg = Scale(ctx.Actor, BaseDamage);
         ctx.BM.DamageEnemy(dmg);
+        ctx.BM.LogDamage(ctx.Actor.displayName, ctx.Enemy.enemyName, dmg);
     }
 }

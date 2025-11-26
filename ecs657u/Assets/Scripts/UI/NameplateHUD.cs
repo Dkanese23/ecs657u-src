@@ -22,6 +22,9 @@ public class NameplateHUD : MonoBehaviour
     RectTransform canvasRect;
     Camera cam;
     NP highlighted;
+    class Entry { public BattleCharacter ch; public UnityEngine.UI.Button btn; }
+    List<Entry> entries = new();
+    BattleManager bm;
 
     void Awake()
     {
@@ -38,6 +41,13 @@ public class NameplateHUD : MonoBehaviour
         var go = Instantiate(itemPrefab, container);
         var rt = go.GetComponent<RectTransform>();
         rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f); // center
+        rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 210f);
+
+        var graphic = go.GetComponent<Graphic>();
+        if (!graphic) graphic = go.AddComponent<Image>();
+        graphic.raycastTarget = true;
+
+        go.transform.SetAsLastSibling();
 
         var np = new NP
         {
@@ -57,6 +67,15 @@ public class NameplateHUD : MonoBehaviour
         };
 
         map[world] = np;
+
+        // inside NameplateHUD.Register (after creating 'go', 'rt', 'np' and map[world]=np)
+        var button = go.GetComponent<Button>();
+        if (!button) button = go.AddComponent<Button>();
+        button.interactable = false; // default off
+
+        var ch = world.GetComponent<BattleCharacter>();
+        entries.Add(new Entry { ch = ch, btn = button });  // may be null for enemy
+
     }
 
     public void Highlight(Transform world)
@@ -90,5 +109,35 @@ public class NameplateHUD : MonoBehaviour
                 canvasRect, sp, null, out var local);
             np.ui.anchoredPosition = local;
         }
+    }
+
+    public void EnableAllyClicks(BattleManager manager)
+    {
+        bm = manager;
+        foreach (var e in entries)
+        {
+            bool isPartyMember = (e.ch != null) && bm.party.Contains(e.ch);
+            e.btn.onClick.RemoveAllListeners();
+            if (isPartyMember)
+            {
+                var local = e; // capture
+                e.btn.onClick.AddListener(() => bm.SelectAllyTarget(local.ch));
+                e.btn.interactable = true;
+            }
+            else
+            {
+                e.btn.interactable = false; // enemy (no clicks)
+            }
+        }
+    }
+
+    public void DisableAllyClicks()
+    {
+        foreach (var e in entries)
+        {
+            e.btn.onClick.RemoveAllListeners();
+            e.btn.interactable = false;
+        }
+        bm = null;
     }
 }

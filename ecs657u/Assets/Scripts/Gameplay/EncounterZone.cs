@@ -4,7 +4,10 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(Collider))]
 public class LoadBattleOnTrigger : MonoBehaviour
 {
-    [SerializeField] string battleSceneName = "Battle";
+    public string enemyId;          // copy from OverworldEnemy on the visible enemy
+    public string enemyType = "Shaman";
+    public string battleSceneName = "Battle";
+    public string mainSceneName = "Main(prototype)";
 
     void Reset()
     {
@@ -18,12 +21,19 @@ public class LoadBattleOnTrigger : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
-        {
-            SceneManager.LoadScene(battleSceneName, LoadSceneMode.Single);
-        }
+        if (!other.CompareTag("Player")) return;
+
+        // Save checkpoint (so we can put player back here on defeat or after battle)
+        var player = other.transform;
+        GameState.I.SetCheckpoint(SceneManager.GetActiveScene().name, player.position, player.rotation);
+
+        // Set up encounter context
+        GameState.I.StartEncounter(enemyId, enemyType);
+
+        // Go to battle
+        SceneManager.LoadScene(battleSceneName);
     }
 }
 

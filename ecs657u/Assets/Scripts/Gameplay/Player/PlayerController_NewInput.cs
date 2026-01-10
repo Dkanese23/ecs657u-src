@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.EventSystems;  // needed for EventSystem
+using UnityEngine.EventSystems;  
+using TMPro; 
+using UnityEngine.UI; 
 
 
 [RequireComponent(typeof(CharacterController))]
@@ -13,6 +15,9 @@ public class PlayerController_NewInput : MonoBehaviour
     public GameObject rebindingPanel;
     public GameObject pausePanel;
     public GameObject contrastVolume;
+
+    public GameObject controlsOverlay;
+    public Text overlayButtonText;
 
     public GameObject settingsPanel;
 
@@ -184,7 +189,7 @@ public class PlayerController_NewInput : MonoBehaviour
         ToggleRebinding();
     }
 
-    // NEW: Handler for the "TogglePause" action
+    // Handler for the "TogglePause" action
     public void OnTogglePause(InputAction.CallbackContext ctx)
     {
         if (!ctx.performed) return;
@@ -210,6 +215,25 @@ public class PlayerController_NewInput : MonoBehaviour
         
         inventoryUI.SetActive(desiredState);
         SetPlayerControl(!desiredState);
+    }
+
+
+    public void ToggleControlsOverlay()
+    {
+        if (!controlsOverlay) return;
+
+        // 1. Toggle the state
+        bool newState = !controlsOverlay.activeSelf;
+        controlsOverlay.SetActive(newState);
+
+        // 2. Update the text
+        if (overlayButtonText != null)
+        {
+            if (newState)
+                overlayButtonText.text = "Controls Overlay: On";
+            else
+                overlayButtonText.text = "Controls Overlay: Off";
+        }
     }
 
     void ToggleRebinding()

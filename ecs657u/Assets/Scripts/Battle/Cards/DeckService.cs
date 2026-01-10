@@ -7,10 +7,9 @@ public class DeckService : MonoBehaviour
     public static DeckService I { get; private set; }
 
     [Header("Deck / Inventory")]
-    public DeckData currentDeck;           // Your deck asset
-    public InventoryData currentInventory; // New inventory asset
+    public DeckData currentDeck;
+    public InventoryData currentInventory;
 
-    // runtime copies so we don't edit assets directly
     private List<CardBase> deckRuntime = new();
     private List<CardBase> inventoryRuntime = new();
 
@@ -22,7 +21,6 @@ public class DeckService : MonoBehaviour
         I = this;
         DontDestroyOnLoad(gameObject);
 
-        // Make safe runtime copies so the assets don’t get modified
         if (currentDeck)
             deckRuntime = new List<CardBase>(currentDeck.cards);
 
@@ -32,7 +30,7 @@ public class DeckService : MonoBehaviour
 
     void Start()
     {
-        OnDeckChanged?.Invoke(); // so UI can refresh
+        OnDeckChanged?.Invoke(); 
     }
 
     public List<CardBase> GetDeckCopy() => new(deckRuntime);
@@ -41,29 +39,41 @@ public class DeckService : MonoBehaviour
     public void AddCard(CardBase card)
     {
         if (card == null) return;
-        if (!deckRuntime.Contains(card))
+
+        // FIX 1: Remove the "Contains" check. 
+        // We only care if the inventory actually HAS one to give us.
+        if (inventoryRuntime.Contains(card)) 
         {
             deckRuntime.Add(card);
-            inventoryRuntime.Remove(card);
+            inventoryRuntime.Remove(card); // Removes the *first* instance found
+            
             Debug.Log($"[DeckService] Added card: {card.Title}");
             OnDeckChanged?.Invoke();
+        }
+        else
+        {
+            Debug.LogWarning("Tried to add a card not present in Runtime Inventory!");
         }
     }
 
     public void RemoveCard(CardBase card)
     {
         if (card == null) return;
+
+        // FIX 2: Just check if we have one to remove.
         if (deckRuntime.Contains(card))
         {
-            deckRuntime.Remove(card);
-            if (!inventoryRuntime.Contains(card))
-                inventoryRuntime.Add(card);
+            deckRuntime.Remove(card); // Removes the *first* instance found
+
+            // FIX 3: Always add it back to inventory. 
+            // Do NOT check (!inventoryRuntime.Contains), or you can't have stacks in inventory!
+            inventoryRuntime.Add(card);
+            
             Debug.Log($"[DeckService] Removed card: {card.Title}");
             OnDeckChanged?.Invoke();
         }
     }
 
-    // Optional helpers to sync back or reset if needed
     public void ResetToDefaults()
     {
         deckRuntime = new List<CardBase>(currentDeck.cards);

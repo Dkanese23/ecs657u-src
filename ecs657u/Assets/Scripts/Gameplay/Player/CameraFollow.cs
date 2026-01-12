@@ -1,84 +1,57 @@
 using UnityEngine;
 
-public class CameraCollision : MonoBehaviour
+public class CameraCollision_Rigged : MonoBehaviour
 {
-    public Transform target;
-    public Vector3 offset = new(0f, 2f, -4f);
-    public float followSmooth = 10f;
-    public bool reduceMotion;
+    [Header("Settings")]
+    public LayerMask collisionLayers = 1; // Default to 'Default' layer
+    public float collisionBuffer = 0.2f;  // Small gap from wall
+    public float sphereRadius = 0.2f;     // Size of the camera "head"
 
-    [Header("Collision Settings")]
-    public bool enableCollision = true;
-    public LayerMask collisionLayers = -1;  // Which layers block camera
-    public float collisionBuffer = 0.2f;    // Distance from walls
-    public float collisionCheckRadius = 0.3f; // Sphere cast size
+    // We store the initial distance (e.g., -4) to know where we WANT to be
+    private float defaultDistance;
+    private Vector3 defaultLocalPos;
+
+    void Awake()
+    {
+        // Remember where the camera was placed in the editor
+        defaultLocalPos = transform.localPosition;
+        defaultDistance = defaultLocalPos.magnitude;
+    }
 
     void LateUpdate()
     {
-        if (!target) return;
+        // 1. Calculate the direction from the Pivot (Parent) to the Camera
+        // Since this script is on the Camera, 'transform.parent' is the Pivot.
+        if (transform.parent == null) return;
+        
+        Vector3 parentPos = transform.parent.position;
+        Vector3 desiredPos = transform.parent.TransformPoint(defaultLocalPos);
+        Vector3 direction = desiredPos - parentPos;
+        float targetDist = direction.magnitude;
 
-        float s = reduceMotion ? 0f : followSmooth;
-        Vector3 desiredPosition = target.position + target.rotation * offset;
-
-        // Handle collision if enabled
-        Vector3 finalPosition = desiredPosition;
-        if (enableCollision)
-        {
-            finalPosition = HandleCollision(target.position, desiredPosition);
-        }
-
-        // Smooth movement
-        if (s <= 0f)
-            transform.position = finalPosition;
-        else
-            transform.position = Vector3.Lerp(transform.position, finalPosition, Time.deltaTime * s);
-
-        // Look at target
-        transform.rotation = Quaternion.LookRotation(target.position - transform.position, Vector3.up);
-    }
-
-    Vector3 HandleCollision(Vector3 fromPosition, Vector3 toPosition)
-    {
-        Vector3 direction = toPosition - fromPosition;
-        float desiredDistance = direction.magnitude;
-
-        // Use SphereCast to check for collisions (better than Raycast for camera)
+        // 2. Check for walls between Pivot and Desired Camera Position
         RaycastHit hit;
-        if (Physics.SphereCast(
-            fromPosition,
-            collisionCheckRadius,
-            direction.normalized,
-            out hit,
-            desiredDistance,
-            collisionLayers))
+        if (Physics.SphereCast(parentPos, sphereRadius, direction.normalized, out hit, defaultDistance, collisionLayers))
         {
-            // Hit something - pull camera closer
-            float safeDistance = Mathf.Max(hit.distance - collisionBuffer, 0.5f);
-            return fromPosition + direction.normalized * safeDistance;
+            // Hit a wall! Calculate new distance
+            // We clamp it so it doesn't zoom inside the player's head (min 0.5f)
+            float hitDist = Mathf.Max(hit.distance - collisionBuffer, 0.5f);
+            
+            // Move camera to the hit point locally
+            transform.localPosition = defaultLocalPos.normalized * hitDist;
         }
-
-        // No collision - use desired position
-        return toPosition;
+        else
+        {
+            // No wall, return to default position smoothly
+            // (Using a fast Lerp here helps smooth out tiny jagged wall edges)
+            transform.localPosition = Vector3.Lerp(transform.localPosition, defaultLocalPos, Time.deltaTime * 10f);
+        }
     }
 
-    // Visualize collision detection in Scene view
+    // Visualize the camera "Head" size
     void OnDrawGizmosSelected()
     {
-        if (!enableCollision || !target) return;
-
-        Vector3 desiredPos = target.position + target.rotation * offset;
-        Vector3 direction = desiredPos - target.position;
-
-        // Draw line from target to camera
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(target.position, transform.position);
-
-        // Draw desired position
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(desiredPos, collisionCheckRadius);
-
-        // Draw collision sphere at current position
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, collisionCheckRadius);
+        Gizmos.DrawWireSphere(transform.position, sphereRadius);
     }
 }

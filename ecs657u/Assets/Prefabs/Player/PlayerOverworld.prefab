@@ -30,7 +30,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1515237933832857849}
-  - {fileID: 8685208526109613593}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5099679751243682577
@@ -99,7 +98,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 8685208526109613593}
   m_Father: {fileID: 8531608173375920}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3947122324822509756
@@ -293,6 +293,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dba454790ce1380409f168f18361e174, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inventoryUI: {fileID: 0}
+  rebindingPanel: {fileID: 0}
+  pausePanel: {fileID: 0}
+  contrastVolume: {fileID: 0}
+  controlsOverlay: {fileID: 0}
+  overlayButtonText: {fileID: 0}
+  settingsPanel: {fileID: 0}
   moveSpeed: 5
   camPivot: {fileID: 0}
   playerCamera: {fileID: 0}
@@ -306,6 +313,7 @@ MonoBehaviour:
   interactMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  animator: {fileID: 0}
 --- !u!1 &8129041774822082054
 GameObject:
   m_ObjectHideFlags: 0
@@ -439,11 +447,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8411211608584059646}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7185649455162775411}
-  m_Father: {fileID: 8531608173375920}
+  m_Father: {fileID: 1515237933832857849}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

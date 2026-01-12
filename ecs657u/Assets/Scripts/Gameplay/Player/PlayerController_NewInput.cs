@@ -37,6 +37,10 @@ public class PlayerController_NewInput : MonoBehaviour
     public float interactRadius = 0.45f;
     public LayerMask interactMask = ~0;
 
+    [Header("Animation")]
+    public Animator animator;
+
+
     CharacterController cc;
     PlayerInput playerInput;
     Vector2 moveInput;
@@ -112,6 +116,14 @@ public class PlayerController_NewInput : MonoBehaviour
 
         if (interactAction != null && interactAction.WasPressedThisFrame())
             TryInteractFromPlayer();
+        
+        float currentSpeed = moveInput.magnitude;
+    
+        // Send it to the Animator
+        if (animator != null)
+        {
+            animator.SetFloat("Speed", currentSpeed);
+        }
     }
 
     void LateUpdate()
@@ -384,4 +396,7 @@ public class PlayerController_NewInput : MonoBehaviour
         }
     }
     // #endregion
+
+
 }
+

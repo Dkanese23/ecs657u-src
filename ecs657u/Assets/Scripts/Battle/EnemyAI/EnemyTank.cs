@@ -30,7 +30,7 @@ public class EnemyTank : EnemyBase
             actionValue = defensiveBuff;
         }
         // Charged attack every 3 turns
-        else if (chargeCounter >= 3)
+        else if (chargeCounter >= (isHardMode ? 2 : 3))
         {
             nextAction = "Charge Attack";
             actionValue = chargeAttackDamage;

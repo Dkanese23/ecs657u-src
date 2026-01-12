@@ -17,6 +17,11 @@ public class Health : MonoBehaviour
         OnHealthChanged?.Invoke(CurrentHP, maxHP);
         if (CurrentHP == 0) OnDeath?.Invoke();
     }
+    public void SetMaxHP(int newMax)
+{
+        maxHP = newMax;
+        CurrentHP = maxHP; // heal to full on spawn
+    }
 
     public void Heal(int amt)
     {

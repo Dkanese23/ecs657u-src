@@ -11,6 +11,9 @@ public abstract class EnemyBase : MonoBehaviour
     public int attackDamage = 3;
     public Health Health { get; private set; }
 
+    [Header("Difficulty State")]
+    protected bool isHardMode;
+
     [Header("AI Behavior")]
     public string nextAction = ""; // What enemy will do next turn
     public int actionValue = 0;    // Damage/heal amount for display
@@ -22,11 +25,34 @@ public abstract class EnemyBase : MonoBehaviour
         Health = GetComponent<Health>();
     }
 
+    protected virtual void ApplyDifficultyScaling()
+    {
+    // Safety check (in case manager isn't loaded)
+    if (DifficultyManager.Instance == null)
+        return;
+
+    // Scale enemy attack damage
+    attackDamage = Mathf.RoundToInt(
+        attackDamage * DifficultyManager.Instance.enemyDamageMultiplier
+    );
+
+    // Scale enemy max HP
+    Health.SetMaxHP(
+        Mathf.RoundToInt(Health.MaxHP * DifficultyManager.Instance.enemyHealthMultiplier)
+    );
+    }
+
+
     public void Initialize(BattleManager bm)
     {
-        battleManager = bm;
-        OnInitialize();
+    battleManager = bm;
+
+    isHardMode = DifficultyManager.Instance.currentDifficulty == Difficulty.Hard;
+
+    ApplyDifficultyScaling();
+    OnInitialize();
     }
+
 
     protected virtual void OnInitialize() { }
 

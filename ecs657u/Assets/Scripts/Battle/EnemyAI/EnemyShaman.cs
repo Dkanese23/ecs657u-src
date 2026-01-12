@@ -24,7 +24,7 @@ public class EnemyShaman : EnemyBase
             actionValue = healAmount;
         }
         // Buff if not buffed yet
-        else if (attackBuff == 0 && Random.value < 0.4f)
+        else if (attackBuff == 0 && Random.value < (isHardMode ? 0.7f : 0.4f))
         {
             nextAction = "Power Up";
             actionValue = buffAmount;

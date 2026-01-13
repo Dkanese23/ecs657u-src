@@ -9,7 +9,16 @@ public class MainMenu : MonoBehaviour
     public void StartGame()
     {
         // Replace "MainScene" with the EXACT name of your game scene file
-        SceneManager.LoadScene("Main(Prototype)");
+        SceneManager.LoadScene("StoryScene");
+    }
+
+    public void QuitGame()
+    {
+        // Logs a message so you know it works in the Editor
+        Debug.Log("Quit Game triggered!"); 
+        
+        // This command closes the build
+        Application.Quit();
     }
 }
 

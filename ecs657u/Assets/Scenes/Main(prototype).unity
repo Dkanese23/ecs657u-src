@@ -5219,11 +5219,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4528212614398928838, guid: 31083b0e52fd9c74c9324e4d77514ead, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 158.51
+      value: 155.51
       objectReference: {fileID: 0}
     - target: {fileID: 4528212614398928838, guid: 31083b0e52fd9c74c9324e4d77514ead, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 35.6315
+      value: 27
       objectReference: {fileID: 0}
     - target: {fileID: 4528212614398928838, guid: 31083b0e52fd9c74c9324e4d77514ead, type: 3}
       propertyPath: m_LocalPosition.x
@@ -5255,11 +5255,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4528212614398928838, guid: 31083b0e52fd9c74c9324e4d77514ead, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -356
+      value: -357.5
       objectReference: {fileID: 0}
     - target: {fileID: 4528212614398928838, guid: 31083b0e52fd9c74c9324e4d77514ead, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 197
+      value: 201.32
       objectReference: {fileID: 0}
     - target: {fileID: 4528212614398928838, guid: 31083b0e52fd9c74c9324e4d77514ead, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -5279,15 +5279,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5312050692110407997, guid: 31083b0e52fd9c74c9324e4d77514ead, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 86.082
+      value: 88.0685
       objectReference: {fileID: 0}
     - target: {fileID: 5312050692110407997, guid: 31083b0e52fd9c74c9324e4d77514ead, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 30
+      value: 38.491
       objectReference: {fileID: 0}
     - target: {fileID: 5312050692110407997, guid: 31083b0e52fd9c74c9324e4d77514ead, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 36.214
+      value: 33.721
       objectReference: {fileID: 0}
     - target: {fileID: 5312050692110407997, guid: 31083b0e52fd9c74c9324e4d77514ead, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -5299,7 +5299,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7678307918936418819, guid: 31083b0e52fd9c74c9324e4d77514ead, type: 3}
       propertyPath: m_Text
-      value: W/A/S/D
+      value: Up/Left/Down/Right
+      objectReference: {fileID: 0}
+    - target: {fileID: 7678307918936418819, guid: 31083b0e52fd9c74c9324e4d77514ead, type: 3}
+      propertyPath: m_FontData.m_Alignment
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 8794844855136785937, guid: 31083b0e52fd9c74c9324e4d77514ead, type: 3}
       propertyPath: m_Action
@@ -18317,7 +18321,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1321901254
 RectTransform:
   m_ObjectHideFlags: 0
@@ -31210,23 +31214,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5312050692110407997, guid: 31083b0e52fd9c74c9324e4d77514ead, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 86.082
+      value: 79.7985
       objectReference: {fileID: 0}
     - target: {fileID: 5312050692110407997, guid: 31083b0e52fd9c74c9324e4d77514ead, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 30
+      value: 36.4
       objectReference: {fileID: 0}
     - target: {fileID: 5312050692110407997, guid: 31083b0e52fd9c74c9324e4d77514ead, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 36.214
+      value: 31.7143
       objectReference: {fileID: 0}
     - target: {fileID: 5312050692110407997, guid: 31083b0e52fd9c74c9324e4d77514ead, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -3.5846
+      value: -0.38452
       objectReference: {fileID: 0}
     - target: {fileID: 7678307918936418819, guid: 31083b0e52fd9c74c9324e4d77514ead, type: 3}
       propertyPath: m_Text
-      value: W/A/S/D
+      value: Up/Left/Down/Right
+      objectReference: {fileID: 0}
+    - target: {fileID: 7678307918936418819, guid: 31083b0e52fd9c74c9324e4d77514ead, type: 3}
+      propertyPath: m_FontData.m_Alignment
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8794844855136785937, guid: 31083b0e52fd9c74c9324e4d77514ead, type: 3}
       propertyPath: m_Action

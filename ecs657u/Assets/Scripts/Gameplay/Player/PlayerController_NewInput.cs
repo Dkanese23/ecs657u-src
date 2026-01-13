@@ -20,6 +20,7 @@ public class PlayerController_NewInput : MonoBehaviour
     public Text overlayButtonText;
 
     public GameObject settingsPanel;
+    public GameObject difficultyPanel;
 
     [Header("Movement")]
     public float moveSpeed = 5f;
@@ -72,7 +73,8 @@ public class PlayerController_NewInput : MonoBehaviour
         inventoryUI?.SetActive(false);
         rebindingPanel?.SetActive(false);
         pausePanel?.SetActive(false);
-        settingsPanel?.SetActive(false); // <-- NEW
+        settingsPanel?.SetActive(false); 
+        difficultyPanel?.SetActive(false);
     }
 
     public void OnMove(InputAction.CallbackContext ctx)
@@ -297,6 +299,7 @@ public class PlayerController_NewInput : MonoBehaviour
         rebindingPanel?.SetActive(false);
         pausePanel?.SetActive(false);
         settingsPanel?.SetActive(false); 
+        difficultyPanel?.SetActive(false);
         
         SetPlayerControl(true);
     }
@@ -310,6 +313,7 @@ public class PlayerController_NewInput : MonoBehaviour
         rebindingPanel?.SetActive(false);
         pausePanel?.SetActive(false);
         settingsPanel?.SetActive(false); 
+        difficultyPanel?.SetActive(false);
         
         // We are still in a UI, so player control remains OFF
         SetPlayerControl(false); 
@@ -324,6 +328,20 @@ public class PlayerController_NewInput : MonoBehaviour
         rebindingPanel?.SetActive(true);
         pausePanel?.SetActive(false);
         settingsPanel?.SetActive(false); 
+        difficultyPanel?.SetActive(false);
+
+        // We are still in a UI, so player control remains OFF
+        SetPlayerControl(false);
+    }
+
+    public void ShowDifficultyPanel()
+    {
+        inventoryUI?.SetActive(false);
+        rebindingPanel?.SetActive(false);
+        pausePanel?.SetActive(false);
+        settingsPanel?.SetActive(false);
+        
+        difficultyPanel?.SetActive(true); // <--- Turn ON Difficulty
 
         // We are still in a UI, so player control remains OFF
         SetPlayerControl(false);
@@ -337,7 +355,8 @@ public class PlayerController_NewInput : MonoBehaviour
         inventoryUI?.SetActive(false);
         rebindingPanel?.SetActive(false);
         pausePanel?.SetActive(true);
-        settingsPanel?.SetActive(false); 
+        settingsPanel?.SetActive(false);
+        difficultyPanel?.SetActive(false);
 
         // We are still in a UI, so player control remains OFF
         SetPlayerControl(false);
@@ -348,7 +367,8 @@ public class PlayerController_NewInput : MonoBehaviour
         inventoryUI?.SetActive(false);
         rebindingPanel?.SetActive(false);
         pausePanel?.SetActive(false);
-        settingsPanel?.SetActive(true); 
+        settingsPanel?.SetActive(true);
+        difficultyPanel?.SetActive(false);
 
         // We are still in a UI, so player control remains OFF
         SetPlayerControl(false);

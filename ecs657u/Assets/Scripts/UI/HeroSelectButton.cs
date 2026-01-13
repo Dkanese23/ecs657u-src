@@ -9,6 +9,6 @@ public class HeroSelectButton : MonoBehaviour
     public void SelectHero()
     {
         SelectedHero.chosenHero = heroData;
-        SceneManager.LoadScene(overworldSceneName);
+        SceneFader.Instance.TransitionToScene("Main(prototype)");
     }
 }

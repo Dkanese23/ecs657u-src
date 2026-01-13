@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d62a71d3a49eb1d49b3e5f8769195511, type: 3}
   m_Name: AssassinData
   m_EditorClassIdentifier: 
-  heroType: 0
-  maxHealth: 0
-  damageMultiplier: 0
+  heroType: 2
+  maxHealth: 80
+  damageMultiplier: 1.3
   lifestealPercent: 0
-  critChance: 0
+  critChance: 0.25
   damageReduction: 0
+  overworldPrefab: {fileID: 0}
+  portrait: {fileID: 0}

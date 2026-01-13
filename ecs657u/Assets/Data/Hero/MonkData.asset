@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d62a71d3a49eb1d49b3e5f8769195511, type: 3}
   m_Name: MonkData
   m_EditorClassIdentifier: 
-  heroType: 0
-  maxHealth: 0
-  damageMultiplier: 0
-  lifestealPercent: 0
+  heroType: 1
+  maxHealth: 100
+  damageMultiplier: 1.1
+  lifestealPercent: 0.2
   critChance: 0
   damageReduction: 0
+  overworldPrefab: {fileID: 0}
+  portrait: {fileID: 0}

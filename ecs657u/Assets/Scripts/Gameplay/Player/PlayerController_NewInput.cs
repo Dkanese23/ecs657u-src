@@ -21,6 +21,7 @@ public class PlayerController_NewInput : MonoBehaviour
 
     public GameObject settingsPanel;
     public GameObject difficultyPanel;
+    public GameObject volumePanel;
 
     [Header("Movement")]
     public float moveSpeed = 5f;
@@ -75,6 +76,7 @@ public class PlayerController_NewInput : MonoBehaviour
         pausePanel?.SetActive(false);
         settingsPanel?.SetActive(false); 
         difficultyPanel?.SetActive(false);
+        volumePanel?.SetActive(false);
     }
 
     public void OnMove(InputAction.CallbackContext ctx)
@@ -300,6 +302,7 @@ public class PlayerController_NewInput : MonoBehaviour
         pausePanel?.SetActive(false);
         settingsPanel?.SetActive(false); 
         difficultyPanel?.SetActive(false);
+        volumePanel?.SetActive(false);
         
         SetPlayerControl(true);
     }
@@ -314,6 +317,7 @@ public class PlayerController_NewInput : MonoBehaviour
         pausePanel?.SetActive(false);
         settingsPanel?.SetActive(false); 
         difficultyPanel?.SetActive(false);
+        volumePanel?.SetActive(false);
         
         // We are still in a UI, so player control remains OFF
         SetPlayerControl(false); 
@@ -329,6 +333,7 @@ public class PlayerController_NewInput : MonoBehaviour
         pausePanel?.SetActive(false);
         settingsPanel?.SetActive(false); 
         difficultyPanel?.SetActive(false);
+        volumePanel?.SetActive(false);
 
         // We are still in a UI, so player control remains OFF
         SetPlayerControl(false);
@@ -340,8 +345,24 @@ public class PlayerController_NewInput : MonoBehaviour
         rebindingPanel?.SetActive(false);
         pausePanel?.SetActive(false);
         settingsPanel?.SetActive(false);
+        volumePanel?.SetActive(false);
         
-        difficultyPanel?.SetActive(true); // <--- Turn ON Difficulty
+        difficultyPanel?.SetActive(true);
+        volumePanel?.SetActive(false);
+
+        // We are still in a UI, so player control remains OFF
+        SetPlayerControl(false);
+    }
+
+    public void ShowVolumePanel()
+    {
+        inventoryUI?.SetActive(false);
+        rebindingPanel?.SetActive(false);
+        pausePanel?.SetActive(false);
+        settingsPanel?.SetActive(false);
+        difficultyPanel?.SetActive(false);
+        
+        volumePanel?.SetActive(true); // <--- Turn ON Volume Panel
 
         // We are still in a UI, so player control remains OFF
         SetPlayerControl(false);
@@ -357,6 +378,7 @@ public class PlayerController_NewInput : MonoBehaviour
         pausePanel?.SetActive(true);
         settingsPanel?.SetActive(false);
         difficultyPanel?.SetActive(false);
+        volumePanel?.SetActive(false);
 
         // We are still in a UI, so player control remains OFF
         SetPlayerControl(false);
@@ -369,6 +391,7 @@ public class PlayerController_NewInput : MonoBehaviour
         pausePanel?.SetActive(false);
         settingsPanel?.SetActive(true);
         difficultyPanel?.SetActive(false);
+        volumePanel?.SetActive(false);
 
         // We are still in a UI, so player control remains OFF
         SetPlayerControl(false);

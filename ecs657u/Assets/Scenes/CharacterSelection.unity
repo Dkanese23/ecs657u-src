@@ -277,7 +277,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   heroData: {fileID: 11400000, guid: c8323d580d3f88641a5778ee43e52b76, type: 2}
-  overworldSceneName: Overworld
+  overworldSceneName: Main(prototype)
 --- !u!114 &629953277
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -528,7 +528,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   heroData: {fileID: 11400000, guid: 787c3d6ef7d2594438edce5a619fc371, type: 2}
-  overworldSceneName: Overworld
+  overworldSceneName: Main(prototype)
 --- !u!114 &654259119
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1419,7 +1419,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   heroData: {fileID: 11400000, guid: 34243580562401448acc8ae8605bfbad, type: 2}
-  overworldSceneName: Overworld
+  overworldSceneName: Main(prototype)
 --- !u!114 &2003319577
 MonoBehaviour:
   m_ObjectHideFlags: 0

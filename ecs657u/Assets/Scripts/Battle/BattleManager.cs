@@ -25,7 +25,7 @@ public partial class BattleManager : MonoBehaviour
     public NameplateHUD nameplateHUD;
 
     [Header("Camera")]
-    public BattleCamera battleCamera;
+    // public BattleCamera battleCamera;
 
     // Deck state
     Queue<CardBase> drawPile = new();
@@ -56,8 +56,8 @@ public partial class BattleManager : MonoBehaviour
 
         // nameplate & camera refresh
         if (nameplateHUD) nameplateHUD.Register(enemy.transform, enemy.Health, enemy.enemyName);
-        if (party != null && party.Count > 0 && battleCamera)
-            battleCamera.SetFocus(party[0].transform, enemy.transform);
+        // if (party != null && party.Count > 0 && battleCamera)
+        //     battleCamera.SetFocus(party[0].transform, enemy.transform);
     }
 
 
@@ -87,13 +87,31 @@ public partial class BattleManager : MonoBehaviour
 
         
         if (enemy != null) AttachEnemy(enemy);
-        // Camera focus on first party member (enemy may come later)
-        if (battleCamera && party != null && party.Count > 0 && party[0])
-            battleCamera.SetFocus(party[0].transform, enemy ? enemy.transform : party[0].transform);
+        // Example: party is List<BattleCharacter>, enemy is EnemyBase
+        var cam = FindObjectOfType<BattleFramingCamera>();
+        if (cam)
+        {
+            var partyTs = new List<Transform>();
+            foreach (var ch in party) if (ch) partyTs.Add(ch.transform);
+            cam.SetPartyAndEnemy(partyTs, enemy ? enemy.transform : null);
+        }
 
         // Deck
         BuildAndShuffleDeck();
         DealStartingHand(5);
+
+        // BattleManager.Start() after you build party & enemy
+        foreach (var ch in party)
+        {
+            var c = ch; // capture
+            ch.Health.OnDeath += () => {
+                c.GetComponent<BattleAnim>()?.PlayDie();
+            };
+        }
+        enemy.Health.OnDeath += () => {
+            enemy.GetComponent<BattleAnim>()?.PlayDie();
+        };
+
 
         ShowHowToThenStart();
     }
@@ -365,10 +383,14 @@ public partial class BattleManager : MonoBehaviour
     public void DamageEnemy(int amount)
     {
         enemy.Health.TakeDamage(amount);
+        enemy.GetComponent<BattleAnim>()?.PlayHit();
         RefreshEnemyHP();
 
         if (enemy.Health.CurrentHP <= 0)
+        {
+            enemy.GetComponent<BattleAnim>()?.PlayDie();
             OnEnemyDeath();
+        }
     }
 
     public void RefreshNameplates()
@@ -406,7 +428,7 @@ public partial class BattleManager : MonoBehaviour
         }
 
         resultPanel.SetActive(true);
-        resultText.text = "Victory! You received a key fragment.";
+        resultText.text = "Victory! You received a key.";
 
         handArea.SetActive(false);
         handPanel.SetActive(false);

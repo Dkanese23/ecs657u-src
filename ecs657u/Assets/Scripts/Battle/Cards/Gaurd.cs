@@ -4,7 +4,7 @@ using UnityEngine;
 public class BuffDefenseCard : CardBase
 {
     public int Turns = 2;
-    public int BaseShield = 5;
+    public int BaseShield = 4;
 
     private void OnEnable()
     {

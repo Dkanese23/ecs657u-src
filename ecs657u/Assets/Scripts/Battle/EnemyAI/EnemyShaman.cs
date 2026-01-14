@@ -6,7 +6,7 @@ public class EnemyShaman : EnemyBase
 {
     [Header("Shaman Settings")]
     public int healAmount = 10;
-    public int magicDamage = 6;
+    public int magicDamage = 8;
     public int buffAmount = 3;
 
     private int attackBuff = 0;
@@ -44,11 +44,13 @@ public class EnemyShaman : EnemyBase
             battleManager.LogAction($"{enemyName} casts Heal!");
             Health.Heal(healAmount);
             turnsSinceHeal = 0;
+            GetComponent<BattleAnim>()?.PlayAttack();
         }
         else if (nextAction == "Power Up")
         {
             battleManager.LogAction($"{enemyName} powers up! Attack increased by {buffAmount}!");
             attackBuff = buffAmount;
+            GetComponent<BattleAnim>()?.PlayAttack();
         }
         else // Dark Bolt
         {
@@ -56,6 +58,8 @@ public class EnemyShaman : EnemyBase
             if (target != null)
             {
                 battleManager.LogAction($"{enemyName} casts Dark Bolt on {target.displayName}!");
+                GetComponent<BattleAnim>()?.PlayAttack();
+                yield return new WaitForSeconds(0.2f);
                 target.ReceiveDamage(magicDamage + attackBuff);
             }
         }

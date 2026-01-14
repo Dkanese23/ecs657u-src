@@ -6,6 +6,7 @@ public class AttackCard : CardBase
     private void OnEnable(){ School = CardSchool.Physical; Title="Strike"; Description="Physical attack."; }
     public override void Play(BattleContext ctx)
     {
+        ctx.Actor.GetComponent<BattleAnim>()?.PlayAttack();
         int dmg = Scale(ctx.Actor, BaseDamage);
         ctx.BM.DamageEnemy(dmg);
         ctx.BM.LogDamage(ctx.Actor.displayName, ctx.Enemy.enemyName, dmg);

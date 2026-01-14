@@ -459,7 +459,7 @@ public partial class BattleManager : MonoBehaviour
         }
         // show UI
         resultPanel.SetActive(true);
-        resultText.text = "Defeat!";
+        resultText.text = "Defeat! Try updating your deck.";
 
         handArea.SetActive(false);
         handPanel.SetActive(false);

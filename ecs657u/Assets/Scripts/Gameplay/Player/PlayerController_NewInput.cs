@@ -11,13 +11,14 @@ public class PlayerController_NewInput : MonoBehaviour
 {
 
     [Header("UI")]
-    public GameObject inventoryUI; // drag your Inventory/Deck panel root here
+    public GameObject inventoryUI; 
     public GameObject rebindingPanel;
     public GameObject pausePanel;
     public GameObject contrastVolume;
 
     public GameObject controlsOverlay;
     public Text overlayButtonText;
+    public Text contrastButtonText;
 
     public GameObject settingsPanel;
     public GameObject difficultyPanel;
@@ -398,15 +399,21 @@ public class PlayerController_NewInput : MonoBehaviour
         SetPlayerControl(false);
     }
 
-        public void ToggleHighContrastMode()
+    public void ToggleHighContrastMode()
     {
-        if (contrastVolume.activeSelf)
+        if (!contrastVolume) return;
+
+        // 1. Toggle the state
+        bool newState = !contrastVolume.activeSelf;
+        contrastVolume.SetActive(newState);
+
+        // 2. Update the text
+        if (contrastButtonText != null)
         {
-            contrastVolume?.SetActive(false);
-        }
-        else
-        {
-            contrastVolume?.SetActive(true);
+            if (newState)
+                contrastButtonText.text = "High Contrast Mode: On";
+            else
+                contrastButtonText.text = "High Contrast Mode: Off";
         }
 
         // We are still in a UI, so player control remains OFF

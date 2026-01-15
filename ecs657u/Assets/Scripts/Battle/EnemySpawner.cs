@@ -13,6 +13,9 @@ public class EnemySpawner : MonoBehaviour
     [Header("Refs")]
     public BattleManager battleManager;
 
+    [Header("Appearance")]
+    public float enemyScale = 1.5f;
+
     void Start()
     {
         string t = GameState.I?.currentEnemyType ?? "Shaman";
@@ -27,6 +30,8 @@ public class EnemySpawner : MonoBehaviour
         var rot = spawnPoint ? spawnPoint.rotation : transform.rotation;
 
         var enemy = Instantiate(prefab, pos, rot);
+
+        enemy.transform.localScale *= enemyScale;
         battleManager.AttachEnemy(enemy);     // see method below
     }
 }

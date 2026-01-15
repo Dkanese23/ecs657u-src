@@ -27,6 +27,7 @@ public class BattleCharacter : MonoBehaviour
 
     public void ReceiveDamage(int amount)
     {
+        GetComponent<BattleAnim>()?.PlayHit();
         int left = amount;
         if (shield > 0)
         {

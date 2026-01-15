@@ -2,7 +2,7 @@ using UnityEngine;
 [CreateAssetMenu(menuName="Cards/Block")]
 public class BlockCard : CardBase
 {
-    public int BaseShield = 5;
+    public int BaseShield = 4;
     private void OnEnable(){ School = CardSchool.Support; Title="Block"; Description="Gain shield."; }
     public override void Play(BattleContext ctx)
     {

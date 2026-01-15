@@ -6,25 +6,27 @@ public class NameplateHUD : MonoBehaviour
 {
     [System.Serializable] public class NP
     {
-        public Transform world;
+        public Transform root;            // character root
+        public Transform anchor;          // head/explicit anchor
+        public Renderer[] renderers;      // for bounds fallback
         public Health health;
         public string displayName;
-        public Vector3 offset = new(0, 2f, 0);
+        public float extraY = 0.25f;      // extra gap above head
         public RectTransform ui;
-        public Image bg;   // optional highlight
+        public Image bg;
         public Text  label;
     }
 
-    public RectTransform container;        // leave empty to use canvas root
-    public GameObject itemPrefab;          // Panel + Text (Legacy)
+    public string anchorChildName = "NameplateAnchor";   // optional child to place on head
+    public RectTransform container;                      // defaults to this canvas root
+    public GameObject itemPrefab;
 
     readonly Dictionary<Transform, NP> map = new();
     RectTransform canvasRect;
     Camera cam;
-    NP highlighted;
-    class Entry { public BattleCharacter ch; public UnityEngine.UI.Button btn; }
-    List<Entry> entries = new();
-    BattleManager bm;
+
+    class Entry { public BattleCharacter ch; public Button btn; }
+    readonly List<Entry> entries = new();
 
     void Awake()
     {
@@ -33,32 +35,28 @@ public class NameplateHUD : MonoBehaviour
         cam = Camera.main;
     }
 
-
-    public void Register(Transform world, Health hp, string name, Vector3? worldOffset = null)
+    public void Register(Transform world, Health hp, string name, Vector3? _unused = null)
     {
         if (!world || !itemPrefab) return;
 
+        // Build UI
         var go = Instantiate(itemPrefab, container);
         var rt = go.GetComponent<RectTransform>();
-        rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f); // center
-        rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 210f);
-
-        var graphic = go.GetComponent<Graphic>();
-        if (!graphic) graphic = go.AddComponent<Image>();
-        graphic.raycastTarget = true;
-
-        go.transform.SetAsLastSibling();
+        rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
 
         var np = new NP
         {
-            world = world,
+            root = world,
             health = hp,
             displayName = name,
-            offset = worldOffset ?? new Vector3(0, 2f, 0),
             ui = rt,
             bg = go.GetComponent<Image>(),
-            label = go.GetComponentInChildren<Text>()
+            label = go.GetComponentInChildren<Text>(),
+            renderers = world.GetComponentsInChildren<Renderer>(true),
         };
+
+        // Find best anchor: explicit child → humanoid head → bounds top
+        np.anchor = FindBestAnchor(world);
 
         if (np.label) np.label.text = $"{name}  HP: {hp.CurrentHP}/{hp.MaxHP}";
         if (hp) hp.OnHealthChanged += (cur, max) =>
@@ -68,43 +66,68 @@ public class NameplateHUD : MonoBehaviour
 
         map[world] = np;
 
-        // inside NameplateHUD.Register (after creating 'go', 'rt', 'np' and map[world]=np)
-        var button = go.GetComponent<Button>();
-        if (!button) button = go.AddComponent<Button>();
-        button.interactable = false; // default off
-
+        var button = go.GetComponent<Button>() ?? go.AddComponent<Button>();
+        button.interactable = false;
         var ch = world.GetComponent<BattleCharacter>();
-        entries.Add(new Entry { ch = ch, btn = button });  // may be null for enemy
+        entries.Add(new Entry { ch = ch, btn = button });
+    }
 
+    Transform FindBestAnchor(Transform t)
+    {
+        // 1) explicit child
+        var child = t.Find(anchorChildName);
+        if (child) return child;
+
+        // 2) humanoid head
+        var anim = t.GetComponentInChildren<Animator>();
+        if (anim && anim.isHuman)
+        {
+            var head = anim.GetBoneTransform(HumanBodyBones.Head);
+            if (head) return head;
+        }
+
+        // 3) fallback: create a temporary anchor at bounds top
+        var go = new GameObject("GeneratedNameplateAnchor");
+        go.transform.SetParent(t, false);
+        go.transform.position = BoundsTopWorld(t);
+        return go.transform;
+    }
+
+    Vector3 BoundsTopWorld(Transform root)
+    {
+        var rends = root.GetComponentsInChildren<Renderer>(true);
+        if (rends.Length == 0) return root.position + Vector3.up * 2f; // generic
+        var b = new Bounds(rends[0].bounds.center, Vector3.zero);
+        for (int i = 0; i < rends.Length; i++) b.Encapsulate(rends[i].bounds);
+        var p = b.center; p.y = b.max.y;
+        return p;
     }
 
     public void Highlight(Transform world)
     {
-        // clear previous
-        if (highlighted != null && highlighted.bg) highlighted.bg.color = new Color(0, 0, 0, 0.4f);
+        foreach (var kv in map)
+            if (kv.Value.bg) kv.Value.bg.color = new Color(1f, 1f, 1f, 0.25f);
 
-        if (world != null && map.TryGetValue(world, out var np))
-        {
-            highlighted = np;
-            if (np.bg) np.bg.color = new Color(0.1f, 0.5f, 1f, 0.55f); // bluish highlight
-        }
-        else highlighted = null;
+        if (world != null && map.TryGetValue(world, out var np) && np.bg)
+            np.bg.color = new Color(0f, 1f, 1f, 0.75f);
     }
 
     void LateUpdate()
     {
         if (!cam) cam = Camera.main;
-
         foreach (var np in map.Values)
         {
-            if (!np.world || !np.ui) continue;
+            if (!np.root || !np.ui) continue;
 
-            Vector3 sp = cam.WorldToScreenPoint(np.world.position + np.offset);
+            // World point directly above head
+            Vector3 headPos = np.anchor ? np.anchor.position : BoundsTopWorld(np.root);
+            headPos += Vector3.up * np.extraY;
+
+            Vector3 sp = cam.WorldToScreenPoint(headPos);
             bool behind = sp.z < 0f;
             np.ui.gameObject.SetActive(!behind);
             if (behind) continue;
 
-            // Convert to anchored position in Overlay canvas
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 canvasRect, sp, null, out var local);
             np.ui.anchoredPosition = local;
@@ -113,20 +136,15 @@ public class NameplateHUD : MonoBehaviour
 
     public void EnableAllyClicks(BattleManager manager)
     {
-        bm = manager;
         foreach (var e in entries)
         {
-            bool isPartyMember = (e.ch != null) && bm.party.Contains(e.ch);
+            bool isParty = (e.ch != null) && manager.party.Contains(e.ch);
             e.btn.onClick.RemoveAllListeners();
-            if (isPartyMember)
+            e.btn.interactable = isParty;
+            if (isParty)
             {
-                var local = e; // capture
-                e.btn.onClick.AddListener(() => bm.SelectAllyTarget(local.ch));
-                e.btn.interactable = true;
-            }
-            else
-            {
-                e.btn.interactable = false; // enemy (no clicks)
+                var local = e;
+                e.btn.onClick.AddListener(() => manager.SelectAllyTarget(local.ch));
             }
         }
     }
@@ -138,6 +156,5 @@ public class NameplateHUD : MonoBehaviour
             e.btn.onClick.RemoveAllListeners();
             e.btn.interactable = false;
         }
-        bm = null;
     }
 }

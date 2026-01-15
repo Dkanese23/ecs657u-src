@@ -6,6 +6,7 @@ public class MagicBoltCard : CardBase
     private void OnEnable(){ School = CardSchool.Magic; Title="Magic Bolt"; Description="Magic damage."; }
     public override void Play(BattleContext ctx)
     {
+        ctx.Actor.GetComponent<BattleAnim>()?.PlayAttack();
         int dmg = Scale(ctx.Actor, BaseDamage);
         ctx.BM.DamageEnemy(dmg);
         ctx.BM.LogDamage(ctx.Actor.displayName, ctx.Enemy.enemyName, dmg);

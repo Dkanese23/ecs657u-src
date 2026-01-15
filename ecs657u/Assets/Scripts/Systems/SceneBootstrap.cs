@@ -4,6 +4,9 @@ using UnityEngine.SceneManagement;
 public class SceneBootstrap : MonoBehaviour
 {
     public Transform player;  // drag your player here
+    public float respawnBackDistance = 4f;
+    public float respawnUpOffset = 0.2f;
+    
 
     void Start()
     {
@@ -19,7 +22,13 @@ public class SceneBootstrap : MonoBehaviour
         {
             // Optional: ensure checkpoint belongs to this scene
             // If not, you can load that scene first. For now we assume Main.
-            player.SetPositionAndRotation(GameState.I.checkpointPos, GameState.I.checkpointRot);
+            Vector3 cpPos = GameState.I.checkpointPos;
+            Quaternion cpRot = GameState.I.checkpointRot;
+
+            Vector3 back = -(cpRot * Vector3.forward) * respawnBackDistance;
+            Vector3 safePos = cpPos + back + Vector3.up * respawnUpOffset;
+
+            player.SetPositionAndRotation(safePos, GameState.I.checkpointRot);
             GameState.I.pendingRespawn = false;
         }
 

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class EnemyTank : EnemyBase
 {
     [Header("Tank Settings")]
-    public int aoeDamage = 4;
+    public int aoeDamage = 6;
     public int defensiveBuff = 5;
     public int chargeAttackDamage = 10;
 
@@ -57,6 +57,8 @@ public class EnemyTank : EnemyBase
             if (target != null)
             {
                 battleManager.LogAction($"{enemyName} unleashes a Charge Attack on {target.displayName}!");
+                GetComponent<BattleAnim>()?.PlayAttack();
+                yield return new WaitForSeconds(0.2f);
                 target.ReceiveDamage(chargeAttackDamage);
                 chargeCounter = 0;
             }
@@ -68,6 +70,8 @@ public class EnemyTank : EnemyBase
             {
                 if (ch.Health.CurrentHP > 0)
                 {
+                    GetComponent<BattleAnim>()?.PlayAttack();
+                    yield return new WaitForSeconds(0.2f);
                     ch.ReceiveDamage(aoeDamage);
                 }
             }

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class EnemyBerserker : EnemyBase
 {
     [Header("Berserker Settings")]
-    public int heavyAttackDamage = 8;
+    public int heavyAttackDamage = 10;
     public int enrageThreshold = 30; // HP % to enrage
 
     private bool isEnraged = false;
@@ -44,7 +44,11 @@ public class EnemyBerserker : EnemyBase
         {
             int damage = isEnraged ? heavyAttackDamage + 2 : heavyAttackDamage;
             battleManager.LogAction($"{enemyName} uses Heavy Strike on {target.displayName}!");
+            // play attack animation
+            GetComponent<BattleAnim>()?.PlayAttack();
+            yield return new WaitForSeconds(0.2f);
             target.ReceiveDamage(damage);
+
         }
         else
         {

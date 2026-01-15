@@ -74,10 +74,30 @@ public class DeckService : MonoBehaviour
         }
     }
 
+
+    // --- ADD THIS TO DeckService.cs ---
+
+    // Call this when picking up a card from the floor
+    public void CollectNewCard(CardBase newCard)
+    {
+        if (newCard == null) return;
+
+        // Add to the "spare cards" list
+        inventoryRuntime.Add(newCard);
+
+        Debug.Log($"[DeckService] Collected new card: {newCard.Title}");
+        
+        // Refresh the UI so the red dot/new card appears
+        OnDeckChanged?.Invoke();
+    }
+
     public void ResetToDefaults()
     {
         deckRuntime = new List<CardBase>(currentDeck.cards);
         inventoryRuntime = new List<CardBase>(currentInventory.cards);
         OnDeckChanged?.Invoke();
     }
+
+
+
 }

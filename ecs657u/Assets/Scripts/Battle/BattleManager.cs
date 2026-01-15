@@ -70,9 +70,19 @@ public partial class BattleManager : MonoBehaviour
         }
         if (returnButton)
         {
-            returnButton.onClick.RemoveAllListeners();
-            // TODO: change to final main scene name
-            returnButton.onClick.AddListener(() => SceneManager.LoadScene("Main(prototype)"));
+            returnButton.onClick.AddListener(() => 
+            {
+                // Default fallback
+                string sceneToLoad = "Main(prototype)"; 
+
+                // Check GameState for the last scene we were in
+                if (GameState.I != null && !string.IsNullOrEmpty(GameState.I.lastScene))
+                {
+                    sceneToLoad = GameState.I.lastScene;
+                }
+
+                SceneManager.LoadScene(sceneToLoad);
+            });
         }
     }
 

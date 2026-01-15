@@ -6,6 +6,7 @@ public class EnemySpawner : MonoBehaviour
     public EnemyBase shamanPrefab;
     public EnemyBase berserkerPrefab;
     public EnemyBase tankPrefab;
+    public EnemyBase dragonPrefab;
 
     [Header("Spawn")]
     public Transform spawnPoint;
@@ -23,6 +24,7 @@ public class EnemySpawner : MonoBehaviour
         {
             "Berserker"  => berserkerPrefab,
             "Tank" => tankPrefab,
+            "Dragon" => dragonPrefab,
             _        => shamanPrefab
         };
 

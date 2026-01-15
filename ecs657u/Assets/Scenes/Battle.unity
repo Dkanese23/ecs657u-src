@@ -2595,6 +2595,7 @@ MonoBehaviour:
   shamanPrefab: {fileID: -1954858775980651157, guid: 90defa8c03bdbe346a88de3c9b59c7ef, type: 3}
   berserkerPrefab: {fileID: -7781482652686602083, guid: 454fc1b5176f6104d83372dc2b5d2f9d, type: 3}
   tankPrefab: {fileID: -4639907371010525265, guid: ca6658c55a1db8a44be371a962fc006d, type: 3}
+  dragonPrefab: {fileID: 3503392841017852987, guid: 24ab408c64163124e8ef00165723291c, type: 3}
   spawnPoint: {fileID: 13385387}
   battleManager: {fileID: 1323040478}
   enemyScale: 1.5

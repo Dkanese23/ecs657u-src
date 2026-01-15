@@ -1,9 +1,8 @@
-
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-// Base enemy class - replace your EnemySimple with this
+// Base enemy class
 public abstract class EnemyBase : MonoBehaviour
 {
     [Header("Base Stats")]
@@ -11,12 +10,17 @@ public abstract class EnemyBase : MonoBehaviour
     public int attackDamage = 3;
     public Health Health { get; private set; }
 
+    [Header("Procedural Generation")]
+    public bool randomizeStats = true; // Check this to enable random stats
+    [Range(0f, 0.5f)] 
+    public float variationRange = 0.2f; // +/- 20% random variation
+
     [Header("Difficulty State")]
     protected bool isHardMode;
 
     [Header("AI Behavior")]
-    public string nextAction = ""; // What enemy will do next turn
-    public int actionValue = 0;    // Damage/heal amount for display
+    public string nextAction = ""; 
+    public int actionValue = 0;    
 
     protected BattleManager battleManager;
 
@@ -25,32 +29,63 @@ public abstract class EnemyBase : MonoBehaviour
         Health = GetComponent<Health>();
     }
 
-    protected virtual void ApplyDifficultyScaling()
+    // NEW: Randomizes stats before difficulty is applied
+    protected virtual void ApplyRandomization()
     {
-    // Safety check (in case manager isn't loaded)
-    if (DifficultyManager.Instance == null)
-        return;
+        if (!randomizeStats) return;
 
-    // Scale enemy attack damage
-    attackDamage = Mathf.RoundToInt(
-        attackDamage * DifficultyManager.Instance.enemyDamageMultiplier
-    );
+        // 1. Calculate a random multiplier (e.g., 0.8 to 1.2)
+        float multiplier = Random.Range(1f - variationRange, 1f + variationRange);
 
-    // Scale enemy max HP
-    Health.SetMaxHP(
-        Mathf.RoundToInt(Health.MaxHP * DifficultyManager.Instance.enemyHealthMultiplier)
-    );
+        // 2. Randomize Attack
+        attackDamage = Mathf.RoundToInt(attackDamage * multiplier);
+        if (attackDamage < 1) attackDamage = 1;
+
+        // 3. Randomize Health
+        if (Health != null)
+        {
+            int newMaxHP = Mathf.RoundToInt(Health.MaxHP * multiplier);
+            
+            // We set MaxHP. Note: Depending on your Health script, 
+            // you might need to ensure CurrentHP is also set to full.
+            Health.SetMaxHP(newMaxHP); 
+            
+            // Optional: Refill health to match new Max if SetMaxHP doesn't do it
+            // Health.CurrentHP = newMaxHP; 
+        }
     }
 
+    protected virtual void ApplyDifficultyScaling()
+    {
+        // Safety check 
+        if (DifficultyManager.Instance == null)
+            return;
+
+        // Scale enemy attack damage
+        attackDamage = Mathf.RoundToInt(
+            attackDamage * DifficultyManager.Instance.enemyDamageMultiplier
+        );
+
+        // Scale enemy max HP
+        Health.SetMaxHP(
+            Mathf.RoundToInt(Health.MaxHP * DifficultyManager.Instance.enemyHealthMultiplier)
+        );
+    }
 
     public void Initialize(BattleManager bm)
     {
-    battleManager = bm;
+        battleManager = bm;
 
-    isHardMode = DifficultyManager.Instance.currentDifficulty == Difficulty.Hard;
+        isHardMode = DifficultyManager.Instance != null && DifficultyManager.Instance.currentDifficulty == Difficulty.Hard;
 
-    ApplyDifficultyScaling();
-    OnInitialize();
+        // ORDER MATTERS:
+        // 1. Randomize the "base" monster stats first
+        ApplyRandomization();
+
+        // 2. Then multiply by difficulty (so Hard mode multiplies the randomized result)
+        ApplyDifficultyScaling();
+        
+        OnInitialize();
     }
 
 

@@ -77,6 +77,7 @@ public class PlayerController_NewInput : MonoBehaviour
         settingsPanel?.SetActive(false); 
         difficultyPanel?.SetActive(false);
         volumePanel?.SetActive(false);
+        lookSensitivity = PlayerPrefs.GetFloat("LookSensitivity", 0.09f);
     }
 
     public void OnMove(InputAction.CallbackContext ctx)
@@ -410,6 +411,17 @@ public class PlayerController_NewInput : MonoBehaviour
 
         // We are still in a UI, so player control remains OFF
         SetPlayerControl(false); 
+    }
+
+    // Call this from the Slider's "On Value Changed" event
+    public void SetLookSensitivity(float newSensitivity)
+    {
+        lookSensitivity = newSensitivity;
+
+        
+        // Save the value to disk
+        PlayerPrefs.SetFloat("LookSensitivity", newSensitivity);
+        PlayerPrefs.Save();
     }
 
     // --- CORE CONTROL FUNCTION ---

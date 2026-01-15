@@ -17,6 +17,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/CharacterSelection.unity
     guid: 1cccf7c640892e2488882a6c51bea6b0
+  - enabled: 1
+    path: Assets/Scenes/ShamanScene.unity
+    guid: cc61e0ecddc58f3409e4f374c59d7dc4
+  - enabled: 1
+    path: Assets/Scenes/PalladinRoom.unity
+    guid: d802666406836d04184203ba0d6956a9
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 850ef9aa2108306438f5632c1292aae6, type: 2}
   m_UseUCBPForAssetBundles: 0

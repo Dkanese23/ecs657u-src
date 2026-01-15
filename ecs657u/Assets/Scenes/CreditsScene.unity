@@ -176,7 +176,30 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 'Thank you for playing Drawn To Battle!
+
+
+    Credits
+
+
+    Battle Mechanics:
+    Dylan
+
+
+    Level Design: Chizara
+
+
+    UI Design: Milan
+
+
+    Sound Design:
+    Layan
+
+
+
+
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5d69acb22bed1dd4a818be02e210d038, type: 2}
   m_sharedMaterial: {fileID: 1691639593965225271, guid: 5d69acb22bed1dd4a818be02e210d038, type: 2}
@@ -210,7 +233,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -241,7 +264,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0.6272125, y: 0, z: 0, w: 0}
+  m_margin: {x: 0.6272125, y: 0, z: 0, w: -90.77536}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -461,7 +484,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 269844202890132599, guid: 88466e33d1bb4c346aaad6def5a7b72f, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 151.04587
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 269844202890132599, guid: 88466e33d1bb4c346aaad6def5a7b72f, type: 3}
       propertyPath: m_LocalRotation.w
@@ -481,11 +504,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 269844202890132599, guid: 88466e33d1bb4c346aaad6def5a7b72f, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -184
+      value: -338
       objectReference: {fileID: 0}
     - target: {fileID: 269844202890132599, guid: 88466e33d1bb4c346aaad6def5a7b72f, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 66
+      value: 17
       objectReference: {fileID: 0}
     - target: {fileID: 269844202890132599, guid: 88466e33d1bb4c346aaad6def5a7b72f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -506,14 +529,14 @@ PrefabInstance:
     - target: {fileID: 906478849357604401, guid: 88466e33d1bb4c346aaad6def5a7b72f, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1911762819}
+      objectReference: {fileID: 1911762821}
     - target: {fileID: 906478849357604401, guid: 88466e33d1bb4c346aaad6def5a7b72f, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OnClickNext
+      value: LoadMenuScene
       objectReference: {fileID: 0}
     - target: {fileID: 906478849357604401, guid: 88466e33d1bb4c346aaad6def5a7b72f, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: StoryManager, Assembly-CSharp
+      value: ReturnToMenu, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 2136843452052347821, guid: 88466e33d1bb4c346aaad6def5a7b72f, type: 3}
       propertyPath: m_Name
@@ -521,7 +544,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5208729097728033402, guid: 88466e33d1bb4c346aaad6def5a7b72f, type: 3}
       propertyPath: m_Text
-      value: Continue
+      value: Back To Start
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -650,7 +673,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.16981131, g: 0.16981131, b: 0.16981131, a: 1}
+  m_Color: {r: 0.18238991, g: 0.18238991, b: 0.18238991, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -890,45 +913,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1911762820}
-  - component: {fileID: 1911762819}
+  - component: {fileID: 1911762821}
   m_Layer: 0
-  m_Name: StoryController
+  m_Name: CreditsManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1911762819
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1911762818}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9611985994d71404cbf0a3edd6be1137, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  storyText: {fileID: 77002524}
-  nextButton: {fileID: 0}
-  sceneToLoad: Main(prototype)
-  typingSpeed: 0.05
-  storyPages:
-  - The heavy stone doors slammed shut behind us, sealing our fate. We are trapped
-    in the Blackdeep Dungeon. My companions look to me for leadership the Mage, whose
-    staff crackles with unstable arcane energy, and the Ranger, whose eyes are sharp
-    enough to pierce the gloom. We no way back. The only way out... is forward.
-  - "Our weapons felt heavy and useless against the shadows lurking here, until we
-    found the Artifact. It speaks to us not in words, but in possibilities. It manifests
-    our skills as Cards\u2014fragments of time and tactics woven into tangible power.
-    With this deck in hand, every battle is a game of strategy, and every draw could
-    mean the difference between life and death."
-  - The enemies ahead are relentless, twisted by the dungeon's curse. But we are
-    not defenseless. We must manage our strength, trust in the cards, and fight as
-    one. The exit lies past the Guardian of the Depths. It is time to draw your weapon...
-    and your hand. Our escape begins now.
-  typingAudio: {fileID: 1025300618}
 --- !u!4 &1911762820
 Transform:
   m_ObjectHideFlags: 0
@@ -944,6 +936,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1911762821
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1911762818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a99bc94c9fcee9a4f978955c63ff9911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  menuSceneName: StartMenu
 --- !u!1 &2083380608
 GameObject:
   m_ObjectHideFlags: 0

@@ -16118,6 +16118,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 906478849357604401, guid: 88466e33d1bb4c346aaad6def5a7b72f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 645932282}
+    - target: {fileID: 906478849357604401, guid: 88466e33d1bb4c346aaad6def5a7b72f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Credits
+      objectReference: {fileID: 0}
+    - target: {fileID: 906478849357604401, guid: 88466e33d1bb4c346aaad6def5a7b72f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: MainMenu, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 2136843452052347821, guid: 88466e33d1bb4c346aaad6def5a7b72f, type: 3}
       propertyPath: m_Name
       value: Button (2)
@@ -19570,6 +19582,7 @@ MonoBehaviour:
   contrastVolume: {fileID: 0}
   controlsOverlay: {fileID: 0}
   overlayButtonText: {fileID: 0}
+  contrastButtonText: {fileID: 0}
   settingsPanel: {fileID: 1351779413}
   difficultyPanel: {fileID: 0}
   volumePanel: {fileID: 0}

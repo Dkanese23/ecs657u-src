@@ -12,6 +12,12 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene("StoryScene");
     }
 
+    public void Credits()
+    {
+
+        SceneManager.LoadScene("CreditsScene");
+    }
+
     public void QuitGame()
     {
         // Logs a message so you know it works in the Editor

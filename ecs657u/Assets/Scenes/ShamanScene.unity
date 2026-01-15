@@ -28201,7 +28201,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca9f1a57001878043b92421849a7b7b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugDifficulty: 2
+  debugDifficulty: 1
   wallPrefab: {fileID: 783457991942227198, guid: 4f00803f76639164a907c9c4548f18df, type: 3}
 --- !u!4 &119939977
 Transform:
@@ -235553,7 +235553,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useDebug: 1
-  debugDiff: 2
+  debugDiff: 0
   wallPrefab: {fileID: 783457991942227198, guid: 4f00803f76639164a907c9c4548f18df, type: 3}
   totemPrefab: {fileID: 5224661601565729200, guid: bedca8665e263b54981fbb35b3c12c98, type: 3}
   bossGoalPrefab: {fileID: 4684797916666575895, guid: d588528bc00dafd4aaae7a261a3ed251, type: 3}

@@ -57,8 +57,8 @@ public class DifficultyManager : MonoBehaviour
                 break;
 
             case Difficulty.Hard:
-                enemyHealthMultiplier = 1.25f;
-                enemyDamageMultiplier = 1.3f;
+                enemyHealthMultiplier = 1.7f;
+                enemyDamageMultiplier = 1.5f;
                 specialMoveChanceBonus = 0.2f; // Enemies use specials 20% more often
                 bonusCardDraw = 0;
                 break;

@@ -428,7 +428,7 @@ public partial class BattleManager : MonoBehaviour
         }
 
         resultPanel.SetActive(true);
-        resultText.text = "Victory! You received a key.";
+        resultText.text = "Victory! Well done.";
 
         handArea.SetActive(false);
         handPanel.SetActive(false);

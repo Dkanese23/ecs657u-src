@@ -1,39 +1,41 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
- 
+using UnityEngine.SceneManagement; // Added this to make calls shorter
 
 public class BossZone : MonoBehaviour
 {
-    // triggers boss battle when player collides and has defeated the three required mini-bosses
-    public string battleSceneName = "BossBattle";
-    public string mainSceneName = "Main(prototype)";
-    public string[] requiredMiniBosses = { "MiniBoss1"};
+    // 1. TYPE THE SCENE NAME HERE IN THE INSPECTOR (Default is "BossBattle")
+    public string battleSceneName = "BossBattle"; 
+    
+    // public string mainSceneName = "Main(prototype)"; // Unused, usually handled by GameState checkpoint
+    public string[] requiredMiniBosses = { "MiniBoss1" };
 
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
 
-        // Check if all required mini-bosses have been defeated
-        //foreach (var bossId in requiredMiniBosses)
-        //{
-        //    if (!GameState.I.IsEnemyDefeated(bossId))
-        //    {
-        //        Debug.Log("Cannot enter boss battle yet. Mini-boss " + bossId + " not defeated.");
-        //        return;
-        //    }
-        //}
+        // -- Uncomment this block when you are ready to enforce boss requirements --
+        /*
+        foreach (var bossId in requiredMiniBosses)
+        {
+            if (GameState.I != null && !GameState.I.IsEnemyDefeated(bossId))
+            {
+                Debug.Log("Cannot enter boss battle yet. Mini-boss " + bossId + " not defeated.");
+                return;
+            }
+        }
+        */
 
-        // Save checkpoint (so we can put player back here on defeat or after battle)
+        // Save checkpoint using current scene name
         var player = other.transform;
-        GameState.I.SetCheckpoint(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name, player.position, player.rotation);
+        if (GameState.I != null)
+        {
+            GameState.I.SetCheckpoint(SceneManager.GetActiveScene().name, player.position, player.rotation);
+            // GameState.I.StartEncounter("BossEnemy", "BossType"); // Uncomment later
+        }
 
-        // Set up encounter context for the boss battle
-        //GameState.I.StartEncounter("BossEnemy", "BossType");
-
-        // Go to boss battle (not implemented yet)
-        UnityEngine.SceneManagement.SceneManager.LoadScene("PalladinRoom");
-        //WinUI.Show("Congrats! You Win 🎉", "Boss coming later…");
+        // 2. USE THE VARIABLE HERE (Instead of hardcoded "PalladinRoom")
+        SceneManager.LoadScene(battleSceneName);
     }
 }

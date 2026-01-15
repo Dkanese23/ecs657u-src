@@ -13634,8 +13634,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9b3e8c60e8928c4492759e558081494, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  battleSceneName: BossBattle
-  mainSceneName: Main(prototype)
+  battleSceneName: ShamanScene
   requiredMiniBosses:
   - 01
   - 02

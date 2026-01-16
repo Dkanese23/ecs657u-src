@@ -154,18 +154,19 @@ This game was created as part of the ECS657U Game Development module at Queen Ma
 - **Git/GitHub** for version control
 
 ### External Assets
-BrokenVector
-Fantasy Wooden GUI Free
-ProxyGames
-Nicrom
-Tornioduva's basic card game asset pack
-Kevin Iglesias
-FST
-FourEvilDragonsPBR
-Crusader tank
-Axe warrior
-Magician_RIO
-
+- BrokenVector
+- Fantasy Wooden GUI Free
+- ProxyGames
+- Nicrom
+- Tornioduva's basic card game asset pack
+- Kevin Iglesias
+- FST
+- FourEvilDragonsPBR
+- Crusader tank
+- Axe warrior
+- Magician_RIO
+- Ultimate Low Poly Dungeon
+- Music by Kevin MacLeod
 
 ---
 

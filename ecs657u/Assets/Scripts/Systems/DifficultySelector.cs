@@ -7,75 +7,61 @@ public class MainMenuDifficulty : MonoBehaviour
     public Image easyBtnImage;
     public Image normalBtnImage;
     public Image hardBtnImage;
-    public Image customBtnImage; // <--- NEW: Add this!
+    public Image customBtnImage;
 
     [Header("Colors")]
     public Color selectedColor = Color.green;
     public Color defaultColor = Color.white;
 
+    // Reference to the panel with health/damage sliders
     public CustomDifficultyUI sliderPanel;
 
     void Start()
     {
+        // Sync visuals with current manager state on load
         UpdateButtonVisuals();
     }
 
-    public void SetEasy()
-    {
-        DifficultyManager.Instance.ApplyDifficulty(Difficulty.Easy);
-        UpdateButtonVisuals();
-        sliderPanel.RefreshUI();
-    }
-
-    public void SetNormal()
-    {
-        DifficultyManager.Instance.ApplyDifficulty(Difficulty.Normal);
-        UpdateButtonVisuals();
-        sliderPanel.RefreshUI();
-    }
-
-    public void SetHard()
-    {
-        DifficultyManager.Instance.ApplyDifficulty(Difficulty.Hard);
-        UpdateButtonVisuals();
-        sliderPanel.RefreshUI();
-    }
+    // Methods for the Button OnClick events
+    public void SetEasy()   => ChangeDifficulty(Difficulty.Easy);
+    public void SetNormal() => ChangeDifficulty(Difficulty.Normal);
+    public void SetHard()   => ChangeDifficulty(Difficulty.Hard);
 
     public void SetCustomMode()
     {
-        // Check if we are already in custom to avoid resetting values
+        // Avoid resetting values if we are already in custom mode
         if (DifficultyManager.Instance.currentDifficulty != Difficulty.Custom)
         {
             DifficultyManager.Instance.ApplyDifficulty(Difficulty.Custom);
         }
         
-        UpdateButtonVisuals(); // <--- NEW: Now we update colors here too!
+        UpdateButtonVisuals();
+        sliderPanel.RefreshUI();
+    }
+
+    
+    private void ChangeDifficulty(Difficulty setting)
+    {
+        DifficultyManager.Instance.ApplyDifficulty(setting);
+        UpdateButtonVisuals();
         sliderPanel.RefreshUI();
     }
 
     void UpdateButtonVisuals()
     {
-        // 1. Reset ALL buttons to white first
+        // Reset all to default first to clear previous selection
         easyBtnImage.color = defaultColor;
         normalBtnImage.color = defaultColor;
         hardBtnImage.color = defaultColor;
-        customBtnImage.color = defaultColor; // <--- NEW: Reset custom too
+        customBtnImage.color = defaultColor;
 
-        // 2. Color only the active one
+        // Highlight the current active choice
         switch (DifficultyManager.Instance.currentDifficulty)
         {
-            case Difficulty.Easy:
-                easyBtnImage.color = selectedColor;
-                break;
-            case Difficulty.Normal:
-                normalBtnImage.color = selectedColor;
-                break;
-            case Difficulty.Hard:
-                hardBtnImage.color = selectedColor;
-                break;
-            case Difficulty.Custom: // <--- NEW: Handle Custom case
-                customBtnImage.color = selectedColor;
-                break;
+            case Difficulty.Easy:   easyBtnImage.color = selectedColor;   break;
+            case Difficulty.Normal: normalBtnImage.color = selectedColor; break;
+            case Difficulty.Hard:   hardBtnImage.color = selectedColor;   break;
+            case Difficulty.Custom: customBtnImage.color = selectedColor; break;
         }
     }
 }

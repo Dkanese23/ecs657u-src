@@ -6,7 +6,7 @@ public class Totem : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            // Tell the manager we found one!
+            // Tell the manager we found a totem
             ShamanTrialManager.Instance.CollectTotem();
             Destroy(gameObject); // Remove from scene
         }

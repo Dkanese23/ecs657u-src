@@ -1,54 +1,54 @@
 using UnityEngine;
 
+// Prevents the camera from clipping through environment geometry during overworld exploration
 public class CameraCollision_Rigged : MonoBehaviour
 {
-    [Header("Settings")]
+    [Header("Collision Settings")]
     public LayerMask collisionLayers = 1; // Default to 'Default' layer
-    public float collisionBuffer = 0.2f;  // Small gap from wall
-    public float sphereRadius = 0.2f;     // Size of the camera "head"
+    public float collisionBuffer = 0.2f;  // Gap maintained between the camera and the wall surface
+    public float sphereRadius = 0.2f;     // Radius of the SphereCast to detect wide collisions
 
-    // We store the initial distance (e.g., -4) to know where we WANT to be
+    // Stores initial placement data to determine the 'ideal' viewing distance
     private float defaultDistance;
     private Vector3 defaultLocalPos;
 
     void Awake()
     {
-        // Remember where the camera was placed in the editor
+        // Captures the editor-set position to use as the baseline for recovery logic
         defaultLocalPos = transform.localPosition;
         defaultDistance = defaultLocalPos.magnitude;
     }
 
+    // LateUpdate ensures the player has moved before we calculate collision
     void LateUpdate()
     {
-        // 1. Calculate the direction from the Pivot (Parent) to the Camera
-        // Since this script is on the Camera, 'transform.parent' is the Pivot.
+        // Safety check to ensure the camera is correctly parented to a pivot point
         if (transform.parent == null) return;
         
         Vector3 parentPos = transform.parent.position;
         Vector3 desiredPos = transform.parent.TransformPoint(defaultLocalPos);
         Vector3 direction = desiredPos - parentPos;
-        float targetDist = direction.magnitude;
 
-        // 2. Check for walls between Pivot and Desired Camera Position
+        // 2. Raycast/SphereCast logic: Probes for obstacles between pivot and camera
         RaycastHit hit;
+        
+        // Using SphereCast instead of Raycast provides a 'thicker' check to prevent corner clipping
         if (Physics.SphereCast(parentPos, sphereRadius, direction.normalized, out hit, defaultDistance, collisionLayers))
         {
-            // Hit a wall! Calculate new distance
-            // We clamp it so it doesn't zoom inside the player's head (min 0.5f)
+            // Collision detected: reposition camera to the point of impact
+            // Clamped at 0.5m to prevent the camera from entering the player's character model
             float hitDist = Mathf.Max(hit.distance - collisionBuffer, 0.5f);
             
-            // Move camera to the hit point locally
             transform.localPosition = defaultLocalPos.normalized * hitDist;
         }
         else
         {
-            // No wall, return to default position smoothly
-            // (Using a fast Lerp here helps smooth out tiny jagged wall edges)
+            // Clear view: return smoothly to the default local position using interpolation
             transform.localPosition = Vector3.Lerp(transform.localPosition, defaultLocalPos, Time.deltaTime * 10f);
         }
     }
 
-    // Visualize the camera "Head" size
+    // Debugging tool to visualise the collision volume in the Unity Editor
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

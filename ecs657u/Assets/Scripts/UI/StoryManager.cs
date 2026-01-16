@@ -13,8 +13,8 @@ public class StoryManager : MonoBehaviour
     public string sceneToLoad = "MainScene";
     public float typingSpeed = 0.04f; 
     
-    [Header("The Story")]
-    [TextArea(3, 10)]
+    [Header("The Story Content")]
+    [TextArea(3, 10)] // Makes it easier to write long paragraphs in the Inspector
     public string[] storyPages; 
 
     private int currentPage = 0;
@@ -24,19 +24,16 @@ public class StoryManager : MonoBehaviour
 
     void Start()
     {
-        // FIX 1: Assign the coroutine to the variable immediately
+        // Begin the first page immediately on load
         typeRoutine = StartCoroutine(TypeStory(storyPages[currentPage]));
     }
 
     public void OnClickNext()
     {
+        // UX Logic: If still typing, finish the page instantly
         if (isTyping)
         {
-            // FIX 2: Safety check to prevent errors if routine is missing
-            if(typeRoutine != null) 
-            {
-                StopCoroutine(typeRoutine);
-            }
+            if(typeRoutine != null) StopCoroutine(typeRoutine);
             
             storyText.text = storyPages[currentPage];
             isTyping = false;
@@ -45,6 +42,7 @@ public class StoryManager : MonoBehaviour
 
         currentPage++;
 
+        // Either move to the next page or transition to the main game
         if (currentPage < storyPages.Length)
         {
             typeRoutine = StartCoroutine(TypeStory(storyPages[currentPage]));
@@ -55,23 +53,22 @@ public class StoryManager : MonoBehaviour
         }
     }
 
+    // Handles the character-by-character typing logic
     IEnumerator TypeStory(string pageText)
     {
         isTyping = true;
         storyText.text = ""; 
 
-        int charCount = 0; // Counter for sound logic
+        int charCount = 0;
 
         foreach (char letter in pageText.ToCharArray())
         {
             storyText.text += letter;
             charCount++;
 
-            // FIX 3: Changed % 3 to % 7 (plays sound every 7th letter)
-            // You can increase this number to make it even quieter (e.g. 10)
+            // Audio Logic: Play sound every few letters to avoid "noise fatigue"
             if (typingAudio != null && charCount % 4 == 0)
             {
-                // Randomize pitch slightly to make it sound less robotic
                 typingAudio.pitch = Random.Range(0.9f, 1.1f);
                 typingAudio.PlayOneShot(typingAudio.clip);
             }

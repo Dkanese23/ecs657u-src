@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Singleton service managing the persistent state of the player's deck and inventory
 public class DeckService : MonoBehaviour
 {
     public static DeckService I { get; private set; }
@@ -10,17 +11,21 @@ public class DeckService : MonoBehaviour
     public DeckData currentDeck;
     public InventoryData currentInventory;
 
+    // Runtime lists to prevent modifying the original ScriptableObject assets
     private List<CardBase> deckRuntime = new();
     private List<CardBase> inventoryRuntime = new();
 
+    // Event triggered to notify UI components of data changes
     public event Action OnDeckChanged;
 
     void Awake()
     {
+        // Implements singleton pattern and ensures persistence across scene transitions
         if (I && I != this) { Destroy(gameObject); return; }
         I = this;
         DontDestroyOnLoad(gameObject);
 
+        // Initialise runtime data from persistent asset templates
         if (currentDeck)
             deckRuntime = new List<CardBase>(currentDeck.cards);
 
@@ -36,16 +41,15 @@ public class DeckService : MonoBehaviour
     public List<CardBase> GetDeckCopy() => new(deckRuntime);
     public List<CardBase> GetInventoryCopy() => new(inventoryRuntime);
 
+    // Moves a card from the inventory to the active battle deck
     public void AddCard(CardBase card)
     {
         if (card == null) return;
 
-        // FIX 1: Remove the "Contains" check. 
-        // We only care if the inventory actually HAS one to give us.
         if (inventoryRuntime.Contains(card)) 
         {
             deckRuntime.Add(card);
-            inventoryRuntime.Remove(card); // Removes the *first* instance found
+            inventoryRuntime.Remove(card); 
             
             Debug.Log($"[DeckService] Added card: {card.Title}");
             OnDeckChanged?.Invoke();
@@ -56,17 +60,14 @@ public class DeckService : MonoBehaviour
         }
     }
 
+    // Returns a card from the active deck to the inventory
     public void RemoveCard(CardBase card)
     {
         if (card == null) return;
 
-        // FIX 2: Just check if we have one to remove.
         if (deckRuntime.Contains(card))
         {
-            deckRuntime.Remove(card); // Removes the *first* instance found
-
-            // FIX 3: Always add it back to inventory. 
-            // Do NOT check (!inventoryRuntime.Contains), or you can't have stacks in inventory!
+            deckRuntime.Remove(card); 
             inventoryRuntime.Add(card);
             
             Debug.Log($"[DeckService] Removed card: {card.Title}");
@@ -74,30 +75,22 @@ public class DeckService : MonoBehaviour
         }
     }
 
-
-    // --- ADD THIS TO DeckService.cs ---
-
-    // Call this when picking up a card from the floor
+    // Handles logic for picking up new cards during exploration
     public void CollectNewCard(CardBase newCard)
     {
         if (newCard == null) return;
 
-        // Add to the "spare cards" list
         inventoryRuntime.Add(newCard);
-
         Debug.Log($"[DeckService] Collected new card: {newCard.Title}");
         
-        // Refresh the UI so the red dot/new card appears
         OnDeckChanged?.Invoke();
     }
 
+    // Reverts runtime lists to their original asset states
     public void ResetToDefaults()
     {
         deckRuntime = new List<CardBase>(currentDeck.cards);
         inventoryRuntime = new List<CardBase>(currentInventory.cards);
         OnDeckChanged?.Invoke();
     }
-
-
-
 }

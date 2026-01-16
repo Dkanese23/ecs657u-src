@@ -15,27 +15,14 @@ public class BossZone : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
 
-        // -- Uncomment this block when you are ready to enforce boss requirements --
-        /*
-        foreach (var bossId in requiredMiniBosses)
-        {
-            if (GameState.I != null && !GameState.I.IsEnemyDefeated(bossId))
-            {
-                Debug.Log("Cannot enter boss battle yet. Mini-boss " + bossId + " not defeated.");
-                return;
-            }
-        }
-        */
-
         // Save checkpoint using current scene name
         var player = other.transform;
         if (GameState.I != null)
         {
             GameState.I.SetCheckpoint(SceneManager.GetActiveScene().name, player.position, player.rotation);
-            // GameState.I.StartEncounter("BossEnemy", "BossType"); // Uncomment later
         }
 
-        // 2. USE THE VARIABLE HERE (Instead of hardcoded "PalladinRoom")
+        // 2. USE THE VARIABLE HERE TO LOAD THE BATTLE SCENE
         SceneManager.LoadScene(battleSceneName);
     }
 }

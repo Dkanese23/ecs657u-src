@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-// Base enemy class
+// Abstract base class for all enemy types, handling AI and stat scaling
 public abstract class EnemyBase : MonoBehaviour
 {
     [Header("Base Stats")]
@@ -11,7 +11,7 @@ public abstract class EnemyBase : MonoBehaviour
     public Health Health { get; private set; }
 
     [Header("Procedural Generation")]
-    public bool randomizeStats = true; // Check this to enable random stats
+    public bool randomizeStats = true; // Enables variance to ensure unique encounters
     [Range(0f, 0.5f)] 
     public float variationRange = 0.2f; // +/- 20% random variation
 
@@ -29,86 +29,74 @@ public abstract class EnemyBase : MonoBehaviour
         Health = GetComponent<Health>();
     }
 
-    // NEW: Randomizes stats before difficulty is applied
+    // Adjusts base stats with a random multiplier to support procedural variety
     protected virtual void ApplyRandomization()
     {
         if (!randomizeStats) return;
 
-        // 1. Calculate a random multiplier (e.g., 0.8 to 1.2)
         float multiplier = Random.Range(1f - variationRange, 1f + variationRange);
 
-        // 2. Randomize Attack
+        // Randomise Attack
         attackDamage = Mathf.RoundToInt(attackDamage * multiplier);
         if (attackDamage < 1) attackDamage = 1;
 
-        // 3. Randomize Health
+        // Randomise Health components
         if (Health != null)
         {
             int newMaxHP = Mathf.RoundToInt(Health.MaxHP * multiplier);
-            
-            // We set MaxHP. Note: Depending on your Health script, 
-            // you might need to ensure CurrentHP is also set to full.
             Health.SetMaxHP(newMaxHP); 
-            
-            // Optional: Refill health to match new Max if SetMaxHP doesn't do it
-            // Health.CurrentHP = newMaxHP; 
         }
     }
 
+    // Scales stats based on the global difficulty setting
     protected virtual void ApplyDifficultyScaling()
     {
-        // Safety check 
-        if (DifficultyManager.Instance == null)
-            return;
+        if (DifficultyManager.Instance == null) return;
 
-        // Scale enemy attack damage
+        // Apply multipliers from the DifficultyManager singleton
         attackDamage = Mathf.RoundToInt(
             attackDamage * DifficultyManager.Instance.enemyDamageMultiplier
         );
 
-        // Scale enemy max HP
         Health.SetMaxHP(
             Mathf.RoundToInt(Health.MaxHP * DifficultyManager.Instance.enemyHealthMultiplier)
         );
     }
 
+    // Initialises the enemy state and applies the scaling hierarchy
     public void Initialize(BattleManager bm)
     {
         battleManager = bm;
-
         isHardMode = DifficultyManager.Instance != null && DifficultyManager.Instance.currentDifficulty == Difficulty.Hard;
 
-        // ORDER MATTERS:
-        // 1. Randomize the "base" monster stats first
+        // Apply randomization before difficulty scaling for consistent results
         ApplyRandomization();
-
-        // 2. Then multiply by difficulty (so Hard mode multiplies the randomized result)
         ApplyDifficultyScaling();
         
         OnInitialize();
     }
 
-
     protected virtual void OnInitialize() { }
 
-    // Each enemy decides what to do on their turn
+    // Core turn logic to be implemented by specific enemy types
     public abstract IEnumerator ExecuteTurn(List<BattleCharacter> party);
 
-    // Called at start of each round to decide next action
+    // AI decision-making phase called at the start of each round
     public abstract void PlanNextAction(List<BattleCharacter> party);
 
-    // Get target based on enemy strategy
+    // Determines the optimal target based on specific AI strategies
     protected BattleCharacter PickTarget(List<BattleCharacter> party, TargetStrategy strategy)
     {
         BattleCharacter target = null;
 
-        // Check for taunt first (overrides strategy)
+        // Prioritise units currently using a Taunt card
         foreach (var ch in party)
             if (ch.isTaunting && ch.Health.CurrentHP > 0) { target = ch; return target; }
 
         switch (strategy)
         {
             case TargetStrategy.LowestHP:
+                // Logic to target the most vulnerable party member
                 int lowestHP = int.MaxValue;
                 foreach (var ch in party)
                 {
@@ -121,6 +109,7 @@ public abstract class EnemyBase : MonoBehaviour
                 break;
 
             case TargetStrategy.HighestHP:
+                // Logic to target the healthiest party member
                 int highestHP = 0;
                 foreach (var ch in party)
                 {
@@ -133,6 +122,7 @@ public abstract class EnemyBase : MonoBehaviour
                 break;
 
             case TargetStrategy.Random:
+                // Selects a random living party member
                 var aliveParty = new List<BattleCharacter>();
                 foreach (var ch in party)
                     if (ch.Health.CurrentHP > 0) aliveParty.Add(ch);

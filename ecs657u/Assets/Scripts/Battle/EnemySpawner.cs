@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// Responsible for dynamically instantiating the correct enemy type based on global state
 public class EnemySpawner : MonoBehaviour
 {
     [Header("Prefabs")]
@@ -8,10 +9,10 @@ public class EnemySpawner : MonoBehaviour
     public EnemyBase tankPrefab;
     public EnemyBase dragonPrefab;
 
-    [Header("Spawn")]
+    [Header("Spawn Settings")]
     public Transform spawnPoint;
 
-    [Header("Refs")]
+    [Header("References")]
     public BattleManager battleManager;
 
     [Header("Appearance")]
@@ -19,21 +20,28 @@ public class EnemySpawner : MonoBehaviour
 
     void Start()
     {
+        // Retrieves the enemy type from the persistent GameState singleton
+        // Utilises the null-coalescing operator (??) to provide a safe fallback
         string t = GameState.I?.currentEnemyType ?? "Shaman";
+
+        // Switch expression: A modern C# feature for cleaner and more readable branching
         EnemyBase prefab = t switch
         {
-            "Berserker"  => berserkerPrefab,
-            "Tank" => tankPrefab,
-            "Dragon" => dragonPrefab,
-            _        => shamanPrefab
+            "Berserker" => berserkerPrefab,
+            "Tank"      => tankPrefab,
+            "Dragon"    => dragonPrefab,
+            _           => shamanPrefab // Default case ensures the game never crashes
         };
 
-        var pos = spawnPoint ? spawnPoint.position : transform.position;
-        var rot = spawnPoint ? spawnPoint.rotation : transform.rotation;
+        // Determine spawn coordinates, defaulting to the spawner's transform if no point is set
+        Vector3 pos = spawnPoint ? spawnPoint.position : transform.position;
+        Quaternion rot = spawnPoint ? spawnPoint.rotation : transform.rotation;
 
-        var enemy = Instantiate(prefab, pos, rot);
+        // Instantiate the specific subclass into the scene
+        EnemyBase enemy = Instantiate(prefab, pos, rot);
 
+        // Apply visual scaling and link the instance to the BattleManager for turn logic
         enemy.transform.localScale *= enemyScale;
-        battleManager.AttachEnemy(enemy);     // see method below
+        battleManager.AttachEnemy(enemy);
     }
 }

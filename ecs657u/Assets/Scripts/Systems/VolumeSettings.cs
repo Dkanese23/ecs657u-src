@@ -2,10 +2,11 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
 
+// Connects UI sliders to the AudioMixer using logarithmic decibel scaling
 public class VolumeSettings : MonoBehaviour
 {
     [Header("Audio Mixer")]
-    public AudioMixer mainMixer; // Drag your 'MainMixer' asset here
+    public AudioMixer mainMixer; 
 
     [Header("Sliders")]
     public Slider masterSlider;
@@ -14,35 +15,34 @@ public class VolumeSettings : MonoBehaviour
 
     void Start()
     {
-        // Set sliders to current mixer values on start
-        // (Optional logic, usually you load from PlayerPrefs here)
+        // Sync sliders with mixer state on menu open
         masterSlider.value = GetSliderValue("MasterVol");
         musicSlider.value = GetSliderValue("MusicVol");
         sfxSlider.value = GetSliderValue("SFXVol");
     }
 
+    // Standard volume formula: dB = 20 * log10(LinearValue)
     public void SetMasterVolume(float sliderValue)
     {
-        // Logarithmic conversion
-        mainMixer.SetFloat("MasterVol", Mathf.Log10(sliderValue) * 20);
+        // We use a small clamping or ensure slider min is 0.0001 to avoid log10(0) errors
+        mainMixer.SetFloat("MasterVol", Mathf.Log10(Mathf.Max(sliderValue, 0.0001f)) * 20);
     }
 
     public void SetMusicVolume(float sliderValue)
     {
-        mainMixer.SetFloat("MusicVol", Mathf.Log10(sliderValue) * 20);
+        mainMixer.SetFloat("MusicVol", Mathf.Log10(Mathf.Max(sliderValue, 0.0001f)) * 20);
     }
 
     public void SetSFXVolume(float sliderValue)
     {
-        mainMixer.SetFloat("SFXVol", Mathf.Log10(sliderValue) * 20);
+        mainMixer.SetFloat("SFXVol", Mathf.Log10(Mathf.Max(sliderValue, 0.0001f)) * 20);
     }
     
-    // Helper to get current volume back to slider value (Decibel to Linear)
+    // Decibel to Linear conversion for UI syncing
     private float GetSliderValue(string paramName)
     {
         float value;
-        bool result = mainMixer.GetFloat(paramName, out value);
-        if(result)
+        if(mainMixer.GetFloat(paramName, out value))
         {
             return Mathf.Pow(10, value / 20);
         }

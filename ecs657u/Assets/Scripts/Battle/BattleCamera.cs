@@ -1,14 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// Dynamic camera system that automatically frames all combat participants
 [RequireComponent(typeof(Camera))]
 public class BattleFramingCamera : MonoBehaviour
 {
     [Header("Targets")]
-    public List<Transform> allTargets = new();   // filled internally
+    public List<Transform> allTargets = new();
 
     [Header("Auto facing")]
-    public bool faceFromPartyTowardEnemy = true; // <-- key change
+    public bool faceFromPartyTowardEnemy = true; 
     Transform enemy;
     readonly List<Transform> party = new();
 
@@ -28,7 +29,7 @@ public class BattleFramingCamera : MonoBehaviour
         currentDistance = Mathf.Clamp((minDistance + maxDistance) * 0.5f, minDistance, maxDistance);
     }
 
-    // Call this from BattleManager after you know party + enemy
+    // Assigns participants and initialises the list for framing calculations
     public void SetPartyAndEnemy(IEnumerable<Transform> partyList, Transform enemyTransform)
     {
         party.Clear();
@@ -44,7 +45,7 @@ public class BattleFramingCamera : MonoBehaviour
     {
         if (allTargets.Count == 0) return;
 
-        // ----- bounds + centers -----
+        // Calculate the bounding area and center point for all units
         Vector3 min = new(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
         Vector3 max = new(float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity);
         Vector3 center = Vector3.zero;
@@ -62,7 +63,7 @@ public class BattleFramingCamera : MonoBehaviour
         center /= count;
         center.y += heightOffset;
 
-        // spans for FOV fit
+        // Calculate horizontal and vertical spans for the framing math
         Vector3 right = Vector3.right;
         float halfWidth = 0f, halfHeight = 0f;
         foreach (var t in allTargets)
@@ -75,6 +76,7 @@ public class BattleFramingCamera : MonoBehaviour
         halfWidth  += padding;
         halfHeight += padding;
 
+        // Trigonometric FOV calculations to determine the ideal camera distance
         float fovV = Mathf.Deg2Rad * cam.fieldOfView;
         float fovH = 2f * Mathf.Atan(Mathf.Tan(fovV * 0.5f) * cam.aspect);
 
@@ -82,21 +84,21 @@ public class BattleFramingCamera : MonoBehaviour
         float distH = halfWidth  / Mathf.Tan(fovH * 0.5f);
         float targetDist = Mathf.Clamp(Mathf.Max(distV, distH), minDistance, maxDistance);
 
-        // ----- facing direction: party -> enemy -----
+        // Orient the camera to face from the party side toward the enemy
         Vector3 forward;
         if (faceFromPartyTowardEnemy && enemy && party.Count > 0)
         {
             Vector3 partyCenter = Vector3.zero;
             int pc = 0; foreach (var t in party) { if (!t) continue; partyCenter += t.position; pc++; }
             if (pc > 0) partyCenter /= pc;
-            forward = (enemy.position - partyCenter).normalized; // look from party side toward enemy
+            forward = (enemy.position - partyCenter).normalized; 
         }
         else
         {
-            // fallback: fixed world forward toward +Z
             forward = Vector3.forward;
         }
 
+        // Apply smooth interpolation to camera position and rotation
         Quaternion rot = Quaternion.LookRotation(forward, Vector3.up) * Quaternion.Euler(pitchDown, 0f, 0f);
         Vector3 desiredPos = center - (rot * Vector3.forward) * targetDist;
 

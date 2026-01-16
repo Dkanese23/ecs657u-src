@@ -2,16 +2,17 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+// Complex boss AI featuring AoE attacks, cooldown management, and state transitions
 public class EnemyDragonBoss : EnemyBase
 {
     [Header("Dragon Settings")]
     public int clawDamage = 9;
-    public int fireBreathDamage = 6;     // applied to ALL party members
-    public int wingBuffetDamage = 4;     // applied to ALL party members
+    public int fireBreathDamage = 6;     // Targeted at all active party members
+    public int wingBuffetDamage = 4;     // Targeted at all active party members
     public int recoverHeal = 12;
 
     [Header("Boss Logic")]
-    [Range(0,100)] public float enrageAtHpPercent = 35f;
+    [Range(0, 100)] public float enrageAtHpPercent = 35f;
     public int enrageBonusDamage = 4;
 
     public int fireBreathCooldownTurns = 3;
@@ -25,16 +26,17 @@ public class EnemyDragonBoss : EnemyBase
     int wingBuffetCD = 0;
     int recoverCD = 0;
 
+    // Evaluates the combat state and selects the most impactful ability
     public override void PlanNextAction(List<BattleCharacter> party)
     {
-        // tick cooldowns
+        // Reduce ability cooldowns at the start of the planning phase
         if (fireBreathCD > 0) fireBreathCD--;
         if (wingBuffetCD > 0) wingBuffetCD--;
         if (recoverCD > 0) recoverCD--;
 
         float hpPercent = (Health.CurrentHP / (float)Health.MaxHP) * 100f;
 
-        // Enrage check
+        // Transition to Enraged state if health falls below the threshold
         if (!enraged && hpPercent <= enrageAtHpPercent)
         {
             nextAction = "Enrage";
@@ -42,7 +44,7 @@ public class EnemyDragonBoss : EnemyBase
             return;
         }
 
-        // If low-ish HP: sometimes recover (with cooldown)
+        // Recovery logic: Weighted by difficulty to increase boss survivability
         if (hpPercent < 40f && recoverCD == 0 && Random.value < (isHardMode ? 0.75f : 0.5f))
         {
             nextAction = "Recover";
@@ -50,7 +52,7 @@ public class EnemyDragonBoss : EnemyBase
             return;
         }
 
-        // Fire Breath: big move, AoE, on cooldown
+        // High-damage AoE: Prioritised when available
         if (fireBreathCD == 0 && Random.value < (isHardMode ? 0.75f : 0.55f))
         {
             nextAction = "Fire Breath";
@@ -58,7 +60,7 @@ public class EnemyDragonBoss : EnemyBase
             return;
         }
 
-        // Wing Buffet: smaller AoE, more frequent
+        // Utility AoE: Frequent disruption of the player party
         if (wingBuffetCD == 0 && Random.value < (isHardMode ? 0.70f : 0.45f))
         {
             nextAction = "Wing Buffet";
@@ -66,14 +68,14 @@ public class EnemyDragonBoss : EnemyBase
             return;
         }
 
-        // Default: Claw Swipe (single target)
+        // Standard single-target attack when abilities are on cooldown
         nextAction = "Claw Swipe";
         actionValue = clawDamage + bonusDamage;
     }
 
+    // Handles the execution of sequences and visual feedback for the boss
     public override IEnumerator ExecuteTurn(List<BattleCharacter> party)
     {
-        // Basic wind-up feel
         yield return new WaitForSeconds(0.15f);
 
         if (nextAction == "Enrage")
@@ -98,12 +100,12 @@ public class EnemyDragonBoss : EnemyBase
             GetComponent<BattleAnim>()?.PlayAttack();
             yield return new WaitForSeconds(0.25f);
 
+            // Apply damage to all living party members
             foreach (var ch in party)
             {
                 if (ch != null && ch.Health.CurrentHP > 0)
                     ch.ReceiveDamage(fireBreathDamage + bonusDamage);
             }
-
             fireBreathCD = fireBreathCooldownTurns;
         }
         else if (nextAction == "Wing Buffet")
@@ -117,12 +119,11 @@ public class EnemyDragonBoss : EnemyBase
                 if (ch != null && ch.Health.CurrentHP > 0)
                     ch.ReceiveDamage(wingBuffetDamage + bonusDamage);
             }
-
             wingBuffetCD = wingBuffetCooldownTurns;
         }
         else // Claw Swipe
         {
-            // Boss-y choice: hit highest HP to pressure the tanky one
+            // Focuses pressure on the tankiest party member
             var target = PickTarget(party, TargetStrategy.HighestHP);
             if (target != null)
             {

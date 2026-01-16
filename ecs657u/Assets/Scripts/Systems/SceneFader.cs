@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
+// Handles smooth visual transitions between game scenes
 public class SceneFader : MonoBehaviour
 {
     public static SceneFader Instance;
@@ -12,30 +13,33 @@ public class SceneFader : MonoBehaviour
     void Awake() {
         if (Instance == null) {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // Keeps fader alive between scenes
+            DontDestroyOnLoad(gameObject); 
         } else {
             Destroy(gameObject);
         }
     }
 
+    // Call this from other scripts instead of SceneManager.LoadScene()
     public void TransitionToScene(string sceneName) {
         StartCoroutine(FadeOutAndIn(sceneName));
     }
 
+    // Coroutine allows for time-based logic without blocking the main thread
     IEnumerator FadeOutAndIn(string sceneName) {
-        // Fade to Black
         float alpha = 0;
+        
+        // 1. Fade out to black
         while (alpha < 1) {
             alpha += Time.deltaTime * fadeSpeed;
             fadeImage.color = new Color(0, 0, 0, alpha);
-            yield return null;
+            yield return null; // Wait for the next frame
         }
 
-        // Load Scene in the background
+        // 2. Load the scene asynchronously in the background
         AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
         while (!operation.isDone) yield return null;
 
-        // Fade to Clear
+        // 3. Fade back in to the new scene
         while (alpha > 0) {
             alpha -= Time.deltaTime * fadeSpeed;
             fadeImage.color = new Color(0, 0, 0, alpha);

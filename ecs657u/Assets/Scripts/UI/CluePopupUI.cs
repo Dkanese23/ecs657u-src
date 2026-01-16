@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // If using TextMeshPro
+using TMPro; 
 
 public class CluePopupUI : MonoBehaviour
 {
@@ -8,7 +8,7 @@ public class CluePopupUI : MonoBehaviour
 
     [Header("UI References")]
     public GameObject popupPanel;
-    public TMP_Text clueText; // Use 'Text' if not using TMP
+    public TMP_Text clueText; 
 
     // Reference to player to lock movement (optional but recommended)
     private PlayerController_NewInput player;

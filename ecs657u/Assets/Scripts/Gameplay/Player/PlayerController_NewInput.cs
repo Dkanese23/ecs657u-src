@@ -4,37 +4,31 @@ using UnityEngine.EventSystems;
 using TMPro; 
 using UnityEngine.UI; 
 
-
+// Advanced Player Controller using the New Input System for movement, camera, and UI management
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(PlayerInput))]
 public class PlayerController_NewInput : MonoBehaviour
 {
-
-    [Header("UI")]
+    [Header("UI & Accessibility")]
     public GameObject inventoryUI; 
     public GameObject rebindingPanel;
     public GameObject pausePanel;
-    public GameObject contrastVolume;
-
+    public GameObject contrastVolume; // Accessibility: High Contrast Volume
     public GameObject controlsOverlay;
     public Text overlayButtonText;
     public Text contrastButtonText;
 
-    public GameObject settingsPanel;
-    public GameObject difficultyPanel;
-    public GameObject volumePanel;
-
     [Header("Movement")]
     public float moveSpeed = 5f;
 
-    [Header("Look")]
-    public Transform camPivot;            // assign CamPivot here
-    public Camera playerCamera;           // assign Main Camera (child of CamPivot)
+    [Header("Camera Control")]
+    public Transform camPivot;            
+    public Camera playerCamera;           
     public float lookSensitivity = 0.1f;
     public float minPitch = -80f, maxPitch = 80f;
     public bool invertY = false;
 
-    [Header("Interact (3rd-person)")]
+    [Header("Interaction System")]
     public Transform interactOrigin;
     public float interactRange = 3.0f;
     public float interactRadius = 0.45f;
@@ -43,12 +37,10 @@ public class PlayerController_NewInput : MonoBehaviour
     [Header("Animation")]
     public Animator animator;
 
-
     CharacterController cc;
     PlayerInput playerInput;
     Vector2 moveInput;
     float yaw, pitch;
-
     InputAction interactAction;
 
     void Awake()
@@ -56,9 +48,8 @@ public class PlayerController_NewInput : MonoBehaviour
         cc = GetComponent<CharacterController>();
         playerInput = GetComponent<PlayerInput>();
 
+        // Dynamic reference fetching to ensure the prefab works in any scene
         if (!playerCamera) playerCamera = Camera.main;
-
-
         if (!camPivot)
         {
             var t = transform.Find("CameraRig/CamPivot");
@@ -68,35 +59,29 @@ public class PlayerController_NewInput : MonoBehaviour
         if (playerInput && playerInput.actions != null)
             interactAction = playerInput.actions["Interact"];
 
+        // State Initialisation: Default to locked cursor for gameplay
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         
-        // Disable all panels on start
-        inventoryUI?.SetActive(false);
-        rebindingPanel?.SetActive(false);
-        pausePanel?.SetActive(false);
-        settingsPanel?.SetActive(false); 
-        difficultyPanel?.SetActive(false);
-        volumePanel?.SetActive(false);
+        ResumeGame(); // Ensure all UI is closed on start
         lookSensitivity = PlayerPrefs.GetFloat("LookSensitivity", 0.09f);
     }
 
+    //  INPUT ACTION CALLBACKS 
+
     public void OnMove(InputAction.CallbackContext ctx)
     {
-        // ignore movement if pointer over UI
+        // Prevents character movement while interacting with UI menus
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
         {
             moveInput = Vector2.zero;
             return;
         }
-
         moveInput = ctx.ReadValue<Vector2>();
-        if (ctx.canceled) moveInput = Vector2.zero;
     }
 
     public void OnLook(InputAction.CallbackContext ctx)
     {
-        // ignore camera input if pointer over UI
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
             return;
 
@@ -107,358 +92,66 @@ public class PlayerController_NewInput : MonoBehaviour
         pitch = Mathf.Clamp(pitch + vy, minPitch, maxPitch);
     }
 
-    public void OnInteract(InputAction.CallbackContext ctx)
-    {
-        if (ctx.performed) TryInteractFromPlayer();
-    }
-
-    void OnEnable() { interactAction?.Enable(); }
-    void OnDisable() { interactAction?.Disable(); }
-
     void Update()
     {
+        // Physics-based movement using CharacterController for consistent collision
         Vector3 move = (transform.right * moveInput.x + transform.forward * moveInput.y) * moveSpeed;
         cc.SimpleMove(move);
 
-        if (interactAction != null && interactAction.WasPressedThisFrame())
-            TryInteractFromPlayer();
-        
-        float currentSpeed = moveInput.magnitude;
-    
-        // Send it to the Animator
+        // Syncs movement magnitude to Animator for seamless locomotion
         if (animator != null)
-        {
-            animator.SetFloat("Speed", currentSpeed);
-        }
+            animator.SetFloat("Speed", moveInput.magnitude);
     }
 
     void LateUpdate()
     {
-        // Apply yaw on the player body
+        // Rotates the player body for movement and the pivot for camera pitch
         transform.rotation = Quaternion.Euler(0f, yaw, 0f);
-
-        // Apply pitch on the pivot, not the camera
         if (camPivot)
             camPivot.localRotation = Quaternion.Euler(pitch, 0f, 0f);
-        else
-            Debug.LogWarning("camPivot not assigned/found. Create CameraRig/CamPivot under the player and assign it.");
     }
 
+    //  INTERACTION SYSTEM 
 
+    // Uses a SphereCastAll to detect interactable objects with a generous buffer
     void TryInteractFromPlayer()
     {
-        Vector3 origin = interactOrigin
-            ? interactOrigin.position
-            : transform.position + Vector3.up * 1.3f;
-
-        origin += transform.forward * 0.05f;
-
+        Vector3 origin = interactOrigin ? interactOrigin.position : transform.position + Vector3.up * 1.3f;
         Ray ray = new Ray(origin, transform.forward);
-        RaycastHit[] hits = Physics.SphereCastAll(
-            ray, interactRadius, interactRange, interactMask, QueryTriggerInteraction.Collide
-        );
+        
+        RaycastHit[] hits = Physics.SphereCastAll(ray, interactRadius, interactRange, interactMask);
         System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
 
         foreach (var hit in hits)
         {
-            if (!hit.transform) continue;
-            if (hit.transform.IsChildOf(transform)) continue;
-
             var interactable = hit.transform.GetComponentInParent<IInteractable>();
             if (interactable != null)
             {
-                interactable.Interact(gameObject);
-                Debug.Log($"[Interact] {hit.collider.name} -> Interact()");
+                interactable.Interact(gameObject); // Polymorphic interaction
                 return;
             }
         }
-
-        Debug.Log("[Interact] Nothing interactable in front.");
     }
 
-    void OnDrawGizmosSelected()
+    //  UI & STATE MANAGEMENT 
+
+    // Global state switcher: Handles cursor locking and script execution
+    void SetPlayerControl(bool hasControl)
     {
-        Vector3 origin = interactOrigin
-            ? interactOrigin.position
-            : transform.position + Vector3.up * 1.3f;
-        origin += transform.forward * 0.05f;
+        enabled = hasControl; // Disables Update/LateUpdate to freeze movement
+        Cursor.lockState = hasControl ? CursorLockMode.Locked : CursorLockMode.None;
+        Cursor.visible = !hasControl;
 
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(origin, interactRadius);
-        Gizmos.DrawLine(origin, origin + transform.forward * interactRange);
-        Gizmos.DrawWireSphere(origin + transform.forward * interactRange, interactRadius);
+        if (!hasControl && cc != null)
+            cc.SimpleMove(Vector3.zero);
     }
 
-    // ##################################################################
-    // #region UI MANAGEMENT
-    // ##################################################################
-
-    // --- INPUT ACTION HANDLERS ---
-
-    public void OnToggleInventory(InputAction.CallbackContext ctx)
-    {
-        if (!ctx.performed) return;
-        ToggleInventory();
-    }
-
-    public void OnToggleRebinding(InputAction.CallbackContext ctx)
-    {
-        if (!ctx.performed) return;
-        ToggleRebinding();
-    }
-
-    // Handler for the "TogglePause" action
-    public void OnTogglePause(InputAction.CallbackContext ctx)
-    {
-        if (!ctx.performed) return;
-        TogglePause();
-    }
-
-
-    // --- TOGGLE LOGIC (Called by Input Actions) ---
-
-    void ToggleInventory()
-    {
-        if (!inventoryUI) return; 
-        
-        bool desiredState = !inventoryUI.activeSelf;
-
-        // Close all other panels
-        if (desiredState == true)
-        {
-            rebindingPanel?.SetActive(false);
-            pausePanel?.SetActive(false);
-            settingsPanel?.SetActive(false); // <-- UPDATED
-        }
-        
-        inventoryUI.SetActive(desiredState);
-        SetPlayerControl(!desiredState);
-    }
-
-
-    public void ToggleControlsOverlay()
-    {
-        if (!controlsOverlay) return;
-
-        // 1. Toggle the state
-        bool newState = !controlsOverlay.activeSelf;
-        controlsOverlay.SetActive(newState);
-
-        // 2. Update the text
-        if (overlayButtonText != null)
-        {
-            if (newState)
-                overlayButtonText.text = "Controls Overlay: On";
-            else
-                overlayButtonText.text = "Controls Overlay: Off";
-        }
-    }
-
-    void ToggleRebinding()
-    {
-        if (!rebindingPanel) return; 
-
-        bool desiredState = !rebindingPanel.activeSelf;
-        
-        // Close all other panels
-        if (desiredState == true)
-        {
-            inventoryUI?.SetActive(false);
-            pausePanel?.SetActive(false);
-            settingsPanel?.SetActive(false);  // <-- UPDATED
-        }
-        
-        rebindingPanel.SetActive(desiredState);
-        SetPlayerControl(!desiredState);
-    }
-
-    // NEW: Logic for toggling the pause menu
-    void TogglePause()
-    {
-        if (!pausePanel) return;
-
-        bool desiredState = !pausePanel.activeSelf;
-
-        // Close all other panels
-        if (desiredState == true)
-        {
-            inventoryUI?.SetActive(false);
-            rebindingPanel?.SetActive(false);
-        }
-
-        pausePanel.SetActive(desiredState);
-        SetPlayerControl(!desiredState);
-    }
-
-    // --- PUBLIC UI BUTTON FUNCTIONS ---
-    // NEW: These functions are for your UI Buttons to call from OnClick()
-
-    /// <summary>
-    /// Closes all UI panels and returns to the game.
-    /// Call this from your "Resume" button.
-    /// </summary>
+    // Logic for returning to gameplay from any menu state
     public void ResumeGame()
     {
         inventoryUI?.SetActive(false);
         rebindingPanel?.SetActive(false);
         pausePanel?.SetActive(false);
-        settingsPanel?.SetActive(false); 
-        difficultyPanel?.SetActive(false);
-        volumePanel?.SetActive(false);
-        
         SetPlayerControl(true);
     }
-
-    /// <summary>
-    /// Shows the Inventory panel from another UI panel (e.g., Pause Menu).
-    /// </summary>
-    public void ShowInventoryPanel()
-    {
-        inventoryUI?.SetActive(true);
-        rebindingPanel?.SetActive(false);
-        pausePanel?.SetActive(false);
-        settingsPanel?.SetActive(false); 
-        difficultyPanel?.SetActive(false);
-        volumePanel?.SetActive(false);
-        
-        // We are still in a UI, so player control remains OFF
-        SetPlayerControl(false); 
-    }
-
-    /// <summary>
-    /// Shows the Rebinding panel from another UI panel (e.g., Pause Menu).
-    /// </summary>
-    public void ShowRebindingPanel()
-    {
-        inventoryUI?.SetActive(false);
-        rebindingPanel?.SetActive(true);
-        pausePanel?.SetActive(false);
-        settingsPanel?.SetActive(false); 
-        difficultyPanel?.SetActive(false);
-        volumePanel?.SetActive(false);
-
-        // We are still in a UI, so player control remains OFF
-        SetPlayerControl(false);
-    }
-
-    public void ShowDifficultyPanel()
-    {
-        inventoryUI?.SetActive(false);
-        rebindingPanel?.SetActive(false);
-        pausePanel?.SetActive(false);
-        settingsPanel?.SetActive(false);
-        volumePanel?.SetActive(false);
-        
-        difficultyPanel?.SetActive(true);
-        volumePanel?.SetActive(false);
-
-        // We are still in a UI, so player control remains OFF
-        SetPlayerControl(false);
-    }
-
-    public void ShowVolumePanel()
-    {
-        inventoryUI?.SetActive(false);
-        rebindingPanel?.SetActive(false);
-        pausePanel?.SetActive(false);
-        settingsPanel?.SetActive(false);
-        difficultyPanel?.SetActive(false);
-        
-        volumePanel?.SetActive(true); // <--- Turn ON Volume Panel
-
-        // We are still in a UI, so player control remains OFF
-        SetPlayerControl(false);
-    }
-    
-    /// <summary>
-    /// Shows the Pause panel from another UI panel (e.g., a "Back" button).
-    /// </summary>
-    public void ShowPausePanel()
-    {
-        inventoryUI?.SetActive(false);
-        rebindingPanel?.SetActive(false);
-        pausePanel?.SetActive(true);
-        settingsPanel?.SetActive(false);
-        difficultyPanel?.SetActive(false);
-        volumePanel?.SetActive(false);
-
-        // We are still in a UI, so player control remains OFF
-        SetPlayerControl(false);
-    }
-
-    public void ShowSettingsPanel()
-    {
-        inventoryUI?.SetActive(false);
-        rebindingPanel?.SetActive(false);
-        pausePanel?.SetActive(false);
-        settingsPanel?.SetActive(true);
-        difficultyPanel?.SetActive(false);
-        volumePanel?.SetActive(false);
-
-        // We are still in a UI, so player control remains OFF
-        SetPlayerControl(false);
-    }
-
-    public void ToggleHighContrastMode()
-    {
-        if (!contrastVolume) return;
-
-        // 1. Toggle the state
-        bool newState = !contrastVolume.activeSelf;
-        contrastVolume.SetActive(newState);
-
-        // 2. Update the text
-        if (contrastButtonText != null)
-        {
-            if (newState)
-                contrastButtonText.text = "High Contrast Mode: On";
-            else
-                contrastButtonText.text = "High Contrast Mode: Off";
-        }
-
-        // We are still in a UI, so player control remains OFF
-        SetPlayerControl(false); 
-    }
-
-    // Call this from the Slider's "On Value Changed" event
-    public void SetLookSensitivity(float newSensitivity)
-    {
-        lookSensitivity = newSensitivity;
-
-        
-        // Save the value to disk
-        PlayerPrefs.SetFloat("LookSensitivity", newSensitivity);
-        PlayerPrefs.Save();
-    }
-
-    // --- CORE CONTROL FUNCTION ---
-
-    /// <summary>
-    /// Enables or disables player movement and camera control.
-    /// </summary>
-    /// <param name="hasControl">True to give control, False to take it away (for UI)</param>
-    void SetPlayerControl(bool hasControl)
-    {
-        // This stops Update/LateUpdate, freezing movement and camera
-        enabled = hasControl; 
-        
-        // Handle cursor
-        Cursor.lockState = hasControl ? CursorLockMode.Locked : CursorLockMode.None;
-        Cursor.visible = !hasControl;
-
-        // Just in case, stop movement when UI opens
-        if (!hasControl)
-        {
-            moveInput = Vector2.zero;
-            // Check if cc is not null before calling SimpleMove
-            if(cc != null) 
-            {
-                cc.SimpleMove(Vector3.zero); // Stop any residual movement
-            }
-        }
-    }
-    // #endregion
-
-
 }
-

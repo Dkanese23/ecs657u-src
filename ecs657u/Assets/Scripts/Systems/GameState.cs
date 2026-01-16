@@ -1,14 +1,13 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+// Acts as the central hub for all persistent data across the game
 public class GameState : MonoBehaviour
 {
     public static GameState I { get; private set; }
 
-    [Header("Defeated enemies (by ID)")]
+    // Using HashSets ensures O(1) lookup performance for progress tracking
     HashSet<string> defeated = new HashSet<string>();
-
-    [Header("Inventory / Key Items")]
     HashSet<string> keyItems = new HashSet<string>();
 
     [Header("Respawn / Checkpoint")]
@@ -18,26 +17,28 @@ public class GameState : MonoBehaviour
     public bool hasCheckpoint = false;
     public bool pendingRespawn = false;
 
-    [Header("Current Encounter (for Battle scene)")]
+    [Header("Battle Context")]
     public string currentEnemyId = null;
-    public string currentEnemyType = null;   // optional: "Shaman", "Brute" etc.
+    public string currentEnemyType = null; 
 
     void Awake()
     {
+        // Singleton pattern: ensures only one 'Brain' exists and it never dies
         if (I != null && I != this) { Destroy(gameObject); return; }
         I = this;
         DontDestroyOnLoad(gameObject);
     }
 
-    // --- Defeated enemies ---
+    // --- Progression Logic ---
     public void MarkEnemyDefeated(string enemyId) { if (!string.IsNullOrEmpty(enemyId)) defeated.Add(enemyId); }
     public bool IsEnemyDefeated(string enemyId) => !string.IsNullOrEmpty(enemyId) && defeated.Contains(enemyId);
 
-    // --- Inventory ---
+    // --- Inventory System ---
     public void AddKeyItem(string itemId) { if (!string.IsNullOrEmpty(itemId)) keyItems.Add(itemId); }
     public bool HasKeyItem(string itemId) => !string.IsNullOrEmpty(itemId) && keyItems.Contains(itemId);
 
-    // --- Checkpoint ---
+    // --- Checkpoint System ---
+    // Saves where the player was so we can return them there after a battle
     public void SetCheckpoint(string sceneName, Vector3 pos, Quaternion rot)
     {
         lastScene = sceneName;
@@ -46,7 +47,7 @@ public class GameState : MonoBehaviour
         hasCheckpoint = true;
     }
 
-    // --- Encounter context ---
+    // --- Encounter Handling ---
     public void StartEncounter(string enemyId, string enemyType = null)
     {
         currentEnemyId = enemyId;

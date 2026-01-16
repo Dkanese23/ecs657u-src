@@ -1,6 +1,4 @@
 using UnityEngine;
-// This defines the types of difficulty available in the game.
-// Placing it outside the class makes it accessible to all other scripts.
 
 public class DifficultyManager : MonoBehaviour
 { 
@@ -14,7 +12,6 @@ public class DifficultyManager : MonoBehaviour
     public float specialMoveChanceBonus = 0f;
     public int bonusCardDraw = 0;
 
-    // NEW: Variables to remember the user's custom config
     [Header("Saved Custom Settings")] 
     private float customHealth = 1f;
     private float customDamage = 1f;
@@ -23,11 +20,11 @@ public class DifficultyManager : MonoBehaviour
 
     private void Awake()
     {   
+        // Singleton pattern: stays alive between scenes and prevents duplicates
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
         
-        // Initialize custom defaults
         customHealth = enemyHealthMultiplier;
         customDamage = enemyDamageMultiplier;
     }
@@ -36,7 +33,7 @@ public class DifficultyManager : MonoBehaviour
     {
         currentDifficulty = diff;
 
-        // If switching TO Custom, load the SAVED custom stats
+        // Switches between user-defined values or the preset hardcoded ones
         if (diff == Difficulty.Custom)
         {
             enemyHealthMultiplier = customHealth;
@@ -46,7 +43,6 @@ public class DifficultyManager : MonoBehaviour
         }
         else 
         {
-            // Otherwise, load the preset stats (Easy/Normal/Hard)
             switch (diff)
             {
                 case Difficulty.Easy:
@@ -73,21 +69,14 @@ public class DifficultyManager : MonoBehaviour
         }
     }
 
-    // Call this when sliders move
+    // Connects toUI sliders in the settings menu
     public void SetCustomDifficulty(float health, float damage, float specialChance, int cardDraw)
     {
         currentDifficulty = Difficulty.Custom;
 
-        // 1. Update the Active Game Variables
-        enemyHealthMultiplier = health;
-        enemyDamageMultiplier = damage;
-        specialMoveChanceBonus = specialChance;
-        bonusCardDraw = cardDraw;
-
-        // 2. Save them to the "Memory" variables
-        customHealth = health;
-        customDamage = damage;
-        customSpecial = specialChance;
-        customDraw = cardDraw;
+        enemyHealthMultiplier = customHealth = health;
+        enemyDamageMultiplier = customDamage = damage;
+        specialMoveChanceBonus = customSpecial = specialChance;
+        bonusCardDraw = customDraw = cardDraw;
     }
 }

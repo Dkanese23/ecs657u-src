@@ -4,27 +4,29 @@ using UnityEngine.UI;
 
 public class NameplateHUD : MonoBehaviour
 {
+    // NP (Nameplate) holds the data for each individual UI element
     [System.Serializable] public class NP
     {
-        public Transform root;            // character root
-        public Transform anchor;          // head/explicit anchor
-        public Renderer[] renderers;      // for bounds fallback
+        public Transform root;         
+        public Transform anchor;       
+        public Renderer[] renderers;   
         public Health health;
         public string displayName;
-        public float extraY = 0.25f;      // extra gap above head
+        public float extraY = 0.25f;   
         public RectTransform ui;
         public Image bg;
-        public Text  label;
+        public Text label;
     }
 
-    public string anchorChildName = "NameplateAnchor";   // optional child to place on head
-    public RectTransform container;                      // defaults to this canvas root
+    public string anchorChildName = "NameplateAnchor"; 
+    public RectTransform container; // The UI parent in the hierarchy
     public GameObject itemPrefab;
 
     readonly Dictionary<Transform, NP> map = new();
     RectTransform canvasRect;
     Camera cam;
 
+    // Helper class to manage clickable buttons for allies
     class Entry { public BattleCharacter ch; public Button btn; }
     readonly List<Entry> entries = new();
 
@@ -39,7 +41,7 @@ public class NameplateHUD : MonoBehaviour
     {
         if (!world || !itemPrefab) return;
 
-        // Build UI
+        // Build the physical UI element on the Canvas
         var go = Instantiate(itemPrefab, container);
         var rt = go.GetComponent<RectTransform>();
         rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
@@ -55,9 +57,10 @@ public class NameplateHUD : MonoBehaviour
             renderers = world.GetComponentsInChildren<Renderer>(true),
         };
 
-        // Find best anchor: explicit child → humanoid head → bounds top
+        // Logic to find where above the character the nameplate should float
         np.anchor = FindBestAnchor(world);
 
+        // Update text initially and subscribe to future health changes
         if (np.label) np.label.text = $"{name}  HP: {hp.CurrentHP}/{hp.MaxHP}";
         if (hp) hp.OnHealthChanged += (cur, max) =>
         {
@@ -66,19 +69,19 @@ public class NameplateHUD : MonoBehaviour
 
         map[world] = np;
 
+        // Setup the button for targeting logic
         var button = go.GetComponent<Button>() ?? go.AddComponent<Button>();
         button.interactable = false;
         var ch = world.GetComponent<BattleCharacter>();
         entries.Add(new Entry { ch = ch, btn = button });
     }
 
+    // Logic to find the "Top" of a character regardless of their shape
     Transform FindBestAnchor(Transform t)
     {
-        // 1) explicit child
         var child = t.Find(anchorChildName);
         if (child) return child;
 
-        // 2) humanoid head
         var anim = t.GetComponentInChildren<Animator>();
         if (anim && anim.isHuman)
         {
@@ -86,30 +89,11 @@ public class NameplateHUD : MonoBehaviour
             if (head) return head;
         }
 
-        // 3) fallback: create a temporary anchor at bounds top
+        // Final fallback: Calculate the highest point of all meshes (renderers)
         var go = new GameObject("GeneratedNameplateAnchor");
         go.transform.SetParent(t, false);
         go.transform.position = BoundsTopWorld(t);
         return go.transform;
-    }
-
-    Vector3 BoundsTopWorld(Transform root)
-    {
-        var rends = root.GetComponentsInChildren<Renderer>(true);
-        if (rends.Length == 0) return root.position + Vector3.up * 2f; // generic
-        var b = new Bounds(rends[0].bounds.center, Vector3.zero);
-        for (int i = 0; i < rends.Length; i++) b.Encapsulate(rends[i].bounds);
-        var p = b.center; p.y = b.max.y;
-        return p;
-    }
-
-    public void Highlight(Transform world)
-    {
-        foreach (var kv in map)
-            if (kv.Value.bg) kv.Value.bg.color = new Color(1f, 1f, 1f, 0.25f);
-
-        if (world != null && map.TryGetValue(world, out var np) && np.bg)
-            np.bg.color = new Color(0f, 1f, 1f, 0.75f);
     }
 
     void LateUpdate()
@@ -119,7 +103,7 @@ public class NameplateHUD : MonoBehaviour
         {
             if (!np.root || !np.ui) continue;
 
-            // World point directly above head
+            // Project 3D point to 2D screen space
             Vector3 headPos = np.anchor ? np.anchor.position : BoundsTopWorld(np.root);
             headPos += Vector3.up * np.extraY;
 
@@ -128,33 +112,10 @@ public class NameplateHUD : MonoBehaviour
             np.ui.gameObject.SetActive(!behind);
             if (behind) continue;
 
+            // Update UI position on the canvas
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 canvasRect, sp, null, out var local);
             np.ui.anchoredPosition = local;
-        }
-    }
-
-    public void EnableAllyClicks(BattleManager manager)
-    {
-        foreach (var e in entries)
-        {
-            bool isParty = (e.ch != null) && manager.party.Contains(e.ch);
-            e.btn.onClick.RemoveAllListeners();
-            e.btn.interactable = isParty;
-            if (isParty)
-            {
-                var local = e;
-                e.btn.onClick.AddListener(() => manager.SelectAllyTarget(local.ch));
-            }
-        }
-    }
-
-    public void DisableAllyClicks()
-    {
-        foreach (var e in entries)
-        {
-            e.btn.onClick.RemoveAllListeners();
-            e.btn.interactable = false;
         }
     }
 }

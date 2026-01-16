@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+// Shaman AI class that utilises support magic and strategic targeting
 public class EnemyShaman : EnemyBase
 {
     [Header("Shaman Settings")]
@@ -12,24 +13,25 @@ public class EnemyShaman : EnemyBase
     private int attackBuff = 0;
     private int turnsSinceHeal = 0;
 
+    // Evaluates the current battle state to decide between healing, buffing, or attacking
     public override void PlanNextAction(List<BattleCharacter> party)
     {
         turnsSinceHeal++;
         float hpPercent = (Health.CurrentHP / (float)Health.MaxHP) * 100f;
 
-        // Heal if below 50% HP and haven't healed in 2+ turns
+        // Reactive Logic: Priority is given to healing if health is low and cooldown has passed
         if (hpPercent < 50f && turnsSinceHeal >= 2)
         {
             nextAction = "Heal";
             actionValue = healAmount;
         }
-        // Buff if not buffed yet
+        // Setup Logic: Increases offensive capability if not currently buffed
         else if (attackBuff == 0 && Random.value < (isHardMode ? 0.7f : 0.4f))
         {
             nextAction = "Power Up";
             actionValue = buffAmount;
         }
-        // Magic attack on lowest HP target
+        // Offensive Logic: Executes a magical strike
         else
         {
             nextAction = "Dark Bolt";
@@ -37,6 +39,7 @@ public class EnemyShaman : EnemyBase
         }
     }
 
+    // Handles the execution of the Shaman's mystical abilities
     public override IEnumerator ExecuteTurn(List<BattleCharacter> party)
     {
         if (nextAction == "Heal")
@@ -54,6 +57,7 @@ public class EnemyShaman : EnemyBase
         }
         else // Dark Bolt
         {
+            // Opportunistic AI: Selects the most vulnerable party member
             var target = PickTarget(party, TargetStrategy.LowestHP);
             if (target != null)
             {
@@ -64,6 +68,7 @@ public class EnemyShaman : EnemyBase
             }
         }
 
+        // Delay to maintain the turn-based rhythm
         yield return new WaitForSeconds(0.5f);
     }
 }

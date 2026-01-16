@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+
+// Specialized enemy subclass focused on high survivability and area-of-effect attacks
 public class EnemyTank : EnemyBase
 {
     [Header("Tank Settings")]
@@ -9,33 +11,35 @@ public class EnemyTank : EnemyBase
     public int chargeAttackDamage = 10;
 
     private bool isDefending = false;
-    private int chargeCounter = 0; // Charges up every 3 turns
+    private int chargeCounter = 0; // Tracks turns elapsed to trigger a powerful ability
 
+    // Initialises the tank with enhanced health pools to reflect its role
     protected override void OnInitialize()
     {
-        // Tank has bonus HP
+        // Tank role specific stat adjustment
         Health.Heal(20);
     }
 
+    // Evaluates battle state to cycle between area attacks and defensive stances
     public override void PlanNextAction(List<BattleCharacter> party)
     {
         chargeCounter++;
 
         float hpPercent = (Health.CurrentHP / (float)Health.MaxHP) * 100f;
 
-        // Defensive stance when low HP
+        // Reactive AI: Switches to a defensive stance when health is critically low
         if (hpPercent < 40f && !isDefending)
         {
             nextAction = "Defensive Stance";
             actionValue = defensiveBuff;
         }
-        // Charged attack every 3 turns
+        // Predictable Threat: Executes a high-damage strike on a set frequency
         else if (chargeCounter >= (isHardMode ? 2 : 3))
         {
             nextAction = "Charge Attack";
             actionValue = chargeAttackDamage;
         }
-        // AOE attack
+        // Standard AOE: Constant pressure on the player's entire party
         else
         {
             nextAction = "Ground Slam";
@@ -43,13 +47,13 @@ public class EnemyTank : EnemyBase
         }
     }
 
+    // Handles the execution of sequences, including AoE damage loops
     public override IEnumerator ExecuteTurn(List<BattleCharacter> party)
     {
         if (nextAction == "Defensive Stance")
         {
             battleManager.LogAction($"{enemyName} takes a Defensive Stance!");
             isDefending = true;
-            // You could reduce damage taken here or add shield
         }
         else if (nextAction == "Charge Attack")
         {
@@ -66,6 +70,8 @@ public class EnemyTank : EnemyBase
         else // Ground Slam (AOE)
         {
             battleManager.LogAction($"{enemyName} uses Ground Slam! All party members take {aoeDamage} damage!");
+            
+            // Iterates through the party to apply damage to all living members
             foreach (var ch in party)
             {
                 if (ch.Health.CurrentHP > 0)
@@ -80,14 +86,14 @@ public class EnemyTank : EnemyBase
         yield return new WaitForSeconds(0.5f);
     }
 
-    // Optional: Override damage received if defending
+    // Logic override to reduce incoming damage while the defensive stance is active
     public void ReceiveDamage(int amount)
     {
         if (isDefending)
         {
             amount = Mathf.Max(1, amount - defensiveBuff);
             battleManager.LogAction($"{enemyName}'s defense reduces damage to {amount}!");
-            isDefending = false; // Defense lasts one hit
+            isDefending = false; // The stance is consumed upon taking damage
         }
         Health.TakeDamage(amount);
     }

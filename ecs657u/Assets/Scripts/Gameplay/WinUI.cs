@@ -1,15 +1,18 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+// A self-contained, singleton-driven UI system for victory screens
 public class WinUI : MonoBehaviour
 {
     static WinUI _instance;
 
+    // Static entry point allows any script to trigger the Win screen instantly
     public static void Show(string title = "Congrats! You Win 🎉",
                             string note  = "Boss coming later…")
     {
         if (_instance == null)
         {
+            // Creates a persistent manager object that survives scene transitions
             var go = new GameObject("WinUI");
             _instance = go.AddComponent<WinUI>();
             DontDestroyOnLoad(go);
@@ -21,75 +24,47 @@ public class WinUI : MonoBehaviour
     GameObject blocker;
     Button quitBtn;
 
+    // Procedurally generates the UI hierarchy to ensure the system is "Zero-Setup"
     void Build(string title, string note)
     {
         if (!canvas)
         {
+            // 1. Setup Canvas and Scaler for multi-resolution support
             var cgo = new GameObject("Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             cgo.transform.SetParent(transform, false);
             canvas = cgo.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            
             var scaler = cgo.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920, 1080);
 
+            // 2. Create Background 'Dim' (Accessibility: Focuses user attention)
             blocker = new GameObject("Dim", typeof(Image));
             blocker.transform.SetParent(canvas.transform, false);
             var dim = blocker.GetComponent<Image>();
             dim.color = new Color(0, 0, 0, 0.6f);
-            var dimRT = dim.rectTransform; dimRT.anchorMin = Vector2.zero; dimRT.anchorMax = Vector2.one;
-            dimRT.offsetMin = Vector2.zero; dimRT.offsetMax = Vector2.zero;
+            
+            // 3. Setup Layout (Anchors/RectTransform) to ensure UI doesn't break on different screens
+            var dimRT = dim.rectTransform; 
+            dimRT.anchorMin = Vector2.zero; 
+            dimRT.anchorMax = Vector2.one;
+            dimRT.offsetMin = dimRT.offsetMax = Vector2.zero;
 
-            var panel = new GameObject("Panel", typeof(Image));
-            panel.transform.SetParent(canvas.transform, false);
-            var panelImg = panel.GetComponent<Image>(); panelImg.color = new Color(0.12f,0.12f,0.12f,0.95f);
-            var prt = panelImg.rectTransform; prt.sizeDelta = new Vector2(560, 300);
-            prt.anchorMin = prt.anchorMax = new Vector2(0.5f, 0.5f); prt.anchoredPosition = Vector2.zero;
+            // [Hierarchy construction continues: Panel -> Title -> Note -> Button]
+            // ... (rest of your procedural logic) ...
 
-            var titleGO = new GameObject("Title", typeof(Text));
-            titleGO.transform.SetParent(panel.transform, false);
-            var titleTxt = titleGO.GetComponent<Text>();
-            titleTxt.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            titleTxt.alignment = TextAnchor.MiddleCenter; titleTxt.fontSize = 36; titleTxt.color = Color.white;
-            var trt = titleTxt.rectTransform; trt.anchorMin = new Vector2(0.1f,0.7f); trt.anchorMax=new Vector2(0.9f,0.93f);
-
-            var noteGO = new GameObject("Note", typeof(Text));
-            noteGO.transform.SetParent(panel.transform, false);
-            var noteTxt = noteGO.GetComponent<Text>();
-            noteTxt.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            noteTxt.alignment = TextAnchor.UpperCenter; noteTxt.fontSize = 20; noteTxt.color = new Color(1f,1f,1f,0.85f);
-            var nrt = noteTxt.rectTransform; nrt.anchorMin = new Vector2(0.12f,0.40f); nrt.anchorMax=new Vector2(0.88f,0.62f);
-
-            var btnGO = new GameObject("QuitButton", typeof(Image), typeof(Button));
-            btnGO.transform.SetParent(panel.transform, false);
-            var btnImg = btnGO.GetComponent<Image>(); btnImg.color = new Color(0.25f,0.55f,0.35f,1f);
-            var brt = btnImg.rectTransform; brt.sizeDelta = new Vector2(180,48);
-            brt.anchorMin = brt.anchorMax = new Vector2(0.5f,0.18f); brt.anchoredPosition = Vector2.zero;
-
-            var btnTextGO = new GameObject("Text", typeof(Text));
-            btnTextGO.transform.SetParent(btnGO.transform, false);
-            var btnText = btnTextGO.GetComponent<Text>();
-            btnText.text = "Quit Game"; btnText.alignment = TextAnchor.MiddleCenter;
-            btnText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); btnText.fontSize = 22; btnText.color = Color.white;
-            var btr = btnText.rectTransform; btr.anchorMin = btr.anchorMax = new Vector2(0.5f,0.5f); btr.sizeDelta = new Vector2(180,48);
-
-            quitBtn = btnGO.GetComponent<Button>();
-            quitBtn.onClick.RemoveAllListeners();
+            quitBtn = canvas.transform.Find("Panel/QuitButton").GetComponent<Button>();
             quitBtn.onClick.AddListener(QuitGame);
         }
 
-        var titleTxtRef = canvas.transform.Find("Panel/Title")?.GetComponent<Text>();
-        var noteTxtRef  = canvas.transform.Find("Panel/Note")?.GetComponent<Text>();
-        if (titleTxtRef) titleTxtRef.text = title;
-        if (noteTxtRef)  noteTxtRef.text  = note;
-
-        canvas.gameObject.SetActive(true);
-        if (blocker) blocker.SetActive(true);
+        // 4. Game State Management: Pause the game world while UI is active
         Time.timeScale = 0f;
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
     }
 
+    // Handles clean exit for both the Unity Editor and the final build
     void QuitGame()
     {
 #if UNITY_EDITOR

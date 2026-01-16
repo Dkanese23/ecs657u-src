@@ -1,38 +1,39 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+// Synchronises the scene state with the global GameState upon loading
 public class SceneBootstrap : MonoBehaviour
 {
-    public Transform player;  // drag your player here
-    public float respawnBackDistance = 4f;
-    public float respawnUpOffset = 0.2f;
+    public Transform player;
+    public float respawnBackDistance = 4f; // Buffer to prevent re-triggering encounters
+    public float respawnUpOffset = 0.2f;   // Prevents player from getting stuck in the floor
     
 
     void Start()
     {
-        // 1) Hide defeated overworld enemies (OverworldEnemy does this on Start() too,
-        //    but doing it here ensures it's cleaned even if enemies are part of a pool)
+        // 1. Persistence Cleanup: Ensures defeated enemies remain gone
         var enemies = FindObjectsOfType<OverworldEnemy>(true);
         foreach (var e in enemies)
+        {
             if (GameState.I != null && GameState.I.IsEnemyDefeated(e.enemyId))
                 e.gameObject.SetActive(false);
+        }
 
-        // 2) Respawn player at last checkpoint if pending
+        // 2. Respawn Logic: Places the player safely after a defeat or retreat
         if (GameState.I != null && GameState.I.pendingRespawn && GameState.I.hasCheckpoint)
         {
-            // Optional: ensure checkpoint belongs to this scene
-            // If not, you can load that scene first. For now we assume Main.
             Vector3 cpPos = GameState.I.checkpointPos;
             Quaternion cpRot = GameState.I.checkpointRot;
 
+            // Calculate a 'safe' spot behind where they were facing
             Vector3 back = -(cpRot * Vector3.forward) * respawnBackDistance;
             Vector3 safePos = cpPos + back + Vector3.up * respawnUpOffset;
 
-            player.SetPositionAndRotation(safePos, GameState.I.checkpointRot);
+            // Update the player's physical location
+            player.SetPositionAndRotation(safePos, cpRot);
+            
+            // Reset the flag so this doesn't happen every time the scene loads
             GameState.I.pendingRespawn = false;
         }
-
-        // 3) (Optional) Open a small toast/UI about new key items, etc.
-        // if (GameState.I.HasKeyItem("key_forest_shaman")) { ... }
     }
 }
